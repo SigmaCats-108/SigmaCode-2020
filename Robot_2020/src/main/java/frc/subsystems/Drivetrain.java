@@ -1,6 +1,8 @@
 package frc.subsystems;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANEncoder;
@@ -9,6 +11,8 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import frc.robot.RobotMap;
 import frc.robot.Robot;
+import com.ctre.phoenix.motorcontrol.*;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 public class Drivetrain
 {
@@ -20,12 +24,14 @@ public class Drivetrain
 	private static CANSparkMax rightSparkMax2 = new CANSparkMax(RobotMap.DRIVETRAIN_RIGHT2, MotorType.kBrushless);
 	private static CANSparkMax rightSparkMax3 = new CANSparkMax(RobotMap.DRIVETRAIN_RIGHT3, MotorType.kBrushless);
 
+	private static TalonFX talonFX = new TalonFX(0);
+
 	private static CANEncoder leftEncoder = leftSparkMax1.getEncoder();
 	private static CANEncoder rightEncoder = rightSparkMax1.getEncoder();
 	
 	private DifferentialDrive drive;
 
-	private static DoubleSolenoid gearShifter = new DoubleSolenoid(RobotMap.PCM1, RobotMap.DRIVETRAIN_SHIFTER_FWD, RobotMap.DRIVETRAIN_SHIFTER_REV);
+	// private static DoubleSolenoid gearShifter = new DoubleSolenoid(RobotMap.PCM1, RobotMap.DRIVETRAIN_SHIFTER_FWD, RobotMap.DRIVETRAIN_SHIFTER_REV);
 
 	private double angleError, turnSpeed, targetEncVal = 0;
 	private double turn_Kp = 1/360, desiredAngle;
@@ -45,10 +51,10 @@ public class Drivetrain
 		rightSparkMax3.setIdleMode(IdleMode.kCoast);
 
 		// Set up followers
-		leftSparkMax2.follow(leftSparkMax1);
-		leftSparkMax3.follow(leftSparkMax1);
-		rightSparkMax2.follow(rightSparkMax1);
-		rightSparkMax3.follow(rightSparkMax1);
+		// leftSparkMax2.follow(leftSparkMax1);
+		// leftSparkMax3.follow(leftSparkMax1);
+		// rightSparkMax2.follow(rightSparkMax1);
+		// rightSparkMax3.follow(rightSparkMax1);
 
 		// Assign DifferentialDrive Motors
 		drive = new DifferentialDrive(leftSparkMax1, rightSparkMax1);
@@ -65,7 +71,9 @@ public class Drivetrain
 	 */
 	public void sigmaDrive(double leftSpeed, double rightSpeed)
 	{
-		drive.tankDrive(-leftSpeed /** RobotMap.DRIVETRAIN_LEFT_PGAIN*/, -rightSpeed, false);
+		// drive.tankDrive(-leftSpeed /** RobotMap.DRIVETRAIN_LEFT_PGAIN*/, -rightSpeed, false);
+		// talonFX.set(ControlMode.PercentOutput, leftSpeed);
+		rightSparkMax1.set(rightSpeed);
 	}
 
 	/**
@@ -75,10 +83,10 @@ public class Drivetrain
 	 */
 	public void highGear(boolean gearState)
 	{
-		if(gearState)
-			gearShifter.set(Value.kReverse);
-		else
-			gearShifter.set(Value.kForward);
+		// if(gearState)
+		// 	gearShifter.set(Value.kReverse);
+		// else
+		// 	gearShifter.set(Value.kForward);
 	}
 
 	/**
@@ -146,7 +154,7 @@ public class Drivetrain
 
 	public void update()
 	{
-		//System.out.println("encoder: " + leftEncoder.getPosition());
+		SmartDashboard.putNumber("LeftEncoder", leftEncoder.getPosition());
 	}
 
 	/**
@@ -229,6 +237,15 @@ public class Drivetrain
 		return false;
 	}
 
+	public double getLeftEncoderVel()
+	{
+		return leftEncoder.getVelocity();
+	}
+	public double getRightEncoderVel()
+	{
+		return rightEncoder.getVelocity();
+	}
+
 	public double getLeftEncoder()
 	{
 		return leftEncoder.getPosition();
@@ -236,5 +253,11 @@ public class Drivetrain
 	public double getRightEncoder()
 	{
 		return rightEncoder.getPosition();
-	}	
+	}
+
+	public void tankDriveVolts(double leftVolts, double rightVolts) 
+	{
+		leftSparkMax1.setVoltage(leftVolts);
+		rightSparkMax1.setVoltage(rightVolts);
+	  }
 }

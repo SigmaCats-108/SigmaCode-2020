@@ -16,9 +16,9 @@ public class IO
 
     public static void UpdateControllers()
     {
-        m_buttonA = mainController.getRawButtonPressed(1);
-        m_buttonB = mainController.getRawButtonPressed(2);
-        m_buttonX = mainController.getRawButtonPressed(3);
+        m_buttonA = mainController.getRawButton(1);
+        m_buttonB = mainController.getRawButton(2);
+        m_buttonX = mainController.getRawButton(3);
         m_buttonXRaw = mainController.getRawButton(3);
         m_buttonY = mainController.getRawButtonPressed(4);
         m_leftBumper = mainController.getRawButton(5);
@@ -37,5 +37,16 @@ public class IO
     public static void ProcessControllers()
     {
         Robot.wheelOfFortune.ruvib();
+
+        if(m_buttonB)
+        {
+            Robot.ballMech.shooterMotor1.set(-0.8);
+            Robot.ballMech.shooterMotor2.set(-0.8);
+
+        }
+        else{
+            Robot.ballMech.shooterMotor1.set(0);
+            Robot.ballMech.shooterMotor2.set(0);
+        }
     }
 }

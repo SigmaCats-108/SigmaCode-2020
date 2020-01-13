@@ -5,6 +5,7 @@ import frc.subsystems.SigmaSight;
 import frc.subsystems.ColorWheel;
 import frc.subsystems.Drivetrain;
 import frc.SensorInputs.NavX;
+import frc.subsystems.BallMech;
 
 public class Robot extends TimedRobot 
 {
@@ -12,6 +13,7 @@ public class Robot extends TimedRobot
     public static Drivetrain drivetrain;
     public static NavX navX;
     public static ColorWheel wheelOfFortune;
+    public static BallMech ballMech;
 
     @Override
     public void robotInit() 
@@ -20,6 +22,7 @@ public class Robot extends TimedRobot
         drivetrain = new Drivetrain();
         navX = new NavX();
         wheelOfFortune = new ColorWheel();
+        ballMech = new BallMech();
     }
 
     @Override
@@ -29,7 +32,7 @@ public class Robot extends TimedRobot
         sigmaSight.testValues();
         drivetrain.update();
         navX.updateAHRS();
-        wheelOfFortune.updateColors();
+        wheelOfFortune.ruvib();
     }
     
     @Override
@@ -52,8 +55,9 @@ public class Robot extends TimedRobot
     public void teleopPeriodic()
     {
         IO.UpdateControllers();
-        drivetrain.sigmaDrive(IO.m_leftAnalogY, IO.m_rightAnalogY);
+        // drivetrain.sigmaDrive(IO.m_leftAnalogY, IO.m_rightAnalogY);
         IO.ProcessControllers();
+      
     }
 
     @Override
