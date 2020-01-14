@@ -16,12 +16,9 @@ public class RobotMap
 	public static final int DRIVETRAIN_RIGHT1 = 4;
 	public static final int DRIVETRAIN_RIGHT2 = 5;
 	public static final int DRIVETRAIN_RIGHT3 = 6;
-	public static final double DRIVETRAIN_LEFT_PGAIN = .986;
 
 	// BallMech ID Values
-	public static final int BALLMECH_LEFTARM = 3;
-	public static final int BALLMECH_RIGHTARM = 10;
-	public static final int BALLMECH_INTAKE = 11;
+	public static final int BALLMECH_INTAKE = 9;
 
 	//climbMech ID Values
 	public static final int CLIMBMECH_MOTOR_LEFT = 2;

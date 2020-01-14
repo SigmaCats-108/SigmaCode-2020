@@ -44,9 +44,19 @@ public class IO
             Robot.ballMech.shooterMotor2.set(-0.8);
 
         }
-        else{
+        else
+        {
             Robot.ballMech.shooterMotor1.set(0);
             Robot.ballMech.shooterMotor2.set(0);
+        }
+
+        if(m_buttonX)
+        {
+            Robot.ballMech.intake(0.8);
+        }
+        else
+        {
+            Robot.ballMech.stopIntake();
         }
     }
 }
