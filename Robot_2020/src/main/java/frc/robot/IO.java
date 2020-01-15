@@ -1,7 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.XboxController;
-import frc.subsystems.ColorWheel;
 
 public class IO
 {
@@ -52,7 +51,7 @@ public class IO
 
         if(m_buttonX)
         {
-            Robot.ballMech.intake(0.8);
+            Robot.ballMech.intake(-0.40);
         }
         else
         {

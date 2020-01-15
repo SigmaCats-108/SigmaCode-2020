@@ -14,8 +14,12 @@ import frc.robot.RobotMap;
 import frc.robot.Robot;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 
-public class Drivetrain
+public class Drivetrain extends SubsystemBase
 {
 	// Motor Controller Declarations
 	private static CANSparkMax leftSparkMax1 = new CANSparkMax(RobotMap.DRIVETRAIN_LEFT1, MotorType.kBrushless);
@@ -29,6 +33,9 @@ public class Drivetrain
 
 	private static CANEncoder leftEncoder = leftSparkMax1.getEncoder();
 	private static CANEncoder rightEncoder = rightSparkMax1.getEncoder();
+
+	// Odometry class for tracking robot pose
+	private DifferentialDriveOdometry m_odometry;
 	
 	private DifferentialDrive drive;
 
@@ -260,5 +267,15 @@ public class Drivetrain
 	{
 		leftSparkMax1.setVoltage(leftVolts);
 		rightSparkMax1.setVoltage(rightVolts);
-	  }
+	}
+	  
+    public Pose2d getPose() 
+    {
+        return m_odometry.getPoseMeters();
+    }
+
+	public DifferentialDriveWheelSpeeds getWheelSpeeds() 
+    {
+        return new DifferentialDriveWheelSpeeds(Robot.drivetrain.getLeftEncoderVel(), Robot.drivetrain.getRightEncoderVel());
+    }
 }
