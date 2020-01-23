@@ -35,23 +35,27 @@ public class IO
 
     public static void ProcessControllers()
     {
-        Robot.wheelOfFortune.ruvib();
-
         if(m_buttonB)
         {
-            Robot.ballMech.shooterMotor1.set(-0.8);
-            Robot.ballMech.shooterMotor2.set(-0.8);
-
+            Robot.ballMech.bangBangShooter();
         }
         else
         {
-            Robot.ballMech.shooterMotor1.set(0);
-            Robot.ballMech.shooterMotor2.set(0);
+            Robot.ballMech.stopShooter();
         }
+
+        // if(m_buttonB)
+        // {
+        //     Robot.ballMech.setShooterMotors(0.3);
+        // }
+        // else
+        // {
+        //     Robot.ballMech.setShooterMotors(0);
+        // }
 
         if(m_buttonX)
         {
-            Robot.ballMech.intake(-0.40);
+            Robot.ballMech.intake(-0.70);
         }
         else
         {

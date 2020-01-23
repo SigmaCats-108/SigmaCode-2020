@@ -4,6 +4,8 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANEncoder;
+import com.ctre.phoenix.motorcontrol.*;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -17,16 +19,21 @@ import frc.robot.RobotMap;
  */
 public class BallMech
 {
-	public CANSparkMax shooterMotor1 = new CANSparkMax(7, MotorType.kBrushless);
-	public CANSparkMax shooterMotor2 = new CANSparkMax(8, MotorType.kBrushless);
-	public CANSparkMax intakeMotor = new CANSparkMax(9, MotorType.kBrushed);
-	
-	private CANEncoder encoder1 = shooterMotor1.getEncoder();
-	//private static CANEncoder encoder2 = shooterMotor2.getEncoder();
+	public CANSparkMax shooterMotor1 = new CANSparkMax(8, MotorType.kBrushless);
+	public CANSparkMax shooterMotor2 = new CANSparkMax(10, MotorType.kBrushless);
+	public CANSparkMax intakeMotor = new CANSparkMax(12, MotorType.kBrushless);
+
+	private static TalonFX talonFX = new TalonFX(0);
 	
 	public BallMech()
 	{
+		talonFX.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 10);
+		talonFX.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_1Ms);
+	}
 
+	public void update()
+	{
+		System.out.println(talonFX.getSelectedSensorVelocity());
 	}
 
 	public void intake(double speed)
@@ -39,23 +46,37 @@ public class BallMech
 		intakeMotor.set(0);
 	}
 
-	void bangBangShooter()
+	public void talonTest(double speed)
 	{
-		double desired_RPM = 5;
-		double actual_RPM = encoder1.getVelocity();
+		talonFX.set(ControlMode.PercentOutput, speed);
+	}
+
+	public void bangBangShooter()
+	{
+		double desired_RPM = 10000;
+		double actual_RPM = talonFX.getSelectedSensorVelocity();
 		if(actual_RPM <= desired_RPM)
 		{
-			setShooterMotors(1.0);
+			setShooterMotors(0.6);
 		}
 		else
 		{	
-			setShooterMotors(0);
+			setShooterMotors(0.59);
 		}
 	}
 
-	void setShooterMotors(double speed)
+	public void setShooterMotors(double speed)
 	{
-		shooterMotor1.set(speed);
-		shooterMotor2.set(speed);
+		talonFX.set(ControlMode.PercentOutput, speed);
 	}
+
+	public void stopShooter()
+	{
+		talonFX.set(ControlMode.PercentOutput, 0);
+	}
+
+	// public void extendIntake()
+	// {
+	// 	intakeCylinder.set(Value.kForward);
+	// }
 }

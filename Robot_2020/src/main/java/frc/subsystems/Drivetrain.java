@@ -2,7 +2,22 @@ package frc.subsystems;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.controller.RamseteController;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
+import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import java.util.List;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
+import frc.robot.Robot;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
@@ -11,13 +26,12 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import frc.robot.RobotMap;
-import frc.robot.Robot;
-import com.ctre.phoenix.motorcontrol.*;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.command.Command;
 
 public class Drivetrain extends SubsystemBase
 {
@@ -28,8 +42,6 @@ public class Drivetrain extends SubsystemBase
 	private static CANSparkMax rightSparkMax1 = new CANSparkMax(RobotMap.DRIVETRAIN_RIGHT1, MotorType.kBrushless);
 	private static CANSparkMax rightSparkMax2 = new CANSparkMax(RobotMap.DRIVETRAIN_RIGHT2, MotorType.kBrushless);
 	private static CANSparkMax rightSparkMax3 = new CANSparkMax(RobotMap.DRIVETRAIN_RIGHT3, MotorType.kBrushless);
-
-	private static TalonFX talonFX = new TalonFX(0);
 
 	private static CANEncoder leftEncoder = leftSparkMax1.getEncoder();
 	private static CANEncoder rightEncoder = rightSparkMax1.getEncoder();
@@ -59,10 +71,10 @@ public class Drivetrain extends SubsystemBase
 		rightSparkMax3.setIdleMode(IdleMode.kCoast);
 
 		// Set up followers
-		// leftSparkMax2.follow(leftSparkMax1);
-		// leftSparkMax3.follow(leftSparkMax1);
-		// rightSparkMax2.follow(rightSparkMax1);
-		// rightSparkMax3.follow(rightSparkMax1);
+		leftSparkMax2.follow(leftSparkMax1);
+		leftSparkMax3.follow(leftSparkMax1);
+		rightSparkMax2.follow(rightSparkMax1);
+		rightSparkMax3.follow(rightSparkMax1);
 
 		// Assign DifferentialDrive Motors
 		drive = new DifferentialDrive(leftSparkMax1, rightSparkMax1);
@@ -79,9 +91,9 @@ public class Drivetrain extends SubsystemBase
 	 */
 	public void sigmaDrive(double leftSpeed, double rightSpeed)
 	{
-		// drive.tankDrive(-leftSpeed /** RobotMap.DRIVETRAIN_LEFT_PGAIN*/, -rightSpeed, false);
+		drive.tankDrive(-leftSpeed /** RobotMap.DRIVETRAIN_LEFT_PGAIN*/, -rightSpeed, false);
 		// talonFX.set(ControlMode.PercentOutput, leftSpeed);
-		rightSparkMax1.set(rightSpeed);
+		// rightSparkMax1.set(rightSpeed);
 	}
 
 	/**
@@ -162,7 +174,7 @@ public class Drivetrain extends SubsystemBase
 
 	public void update()
 	{
-		SmartDashboard.putNumber("LeftEncoder", leftEncoder.getPosition());
+
 	}
 
 	/**
@@ -277,5 +289,76 @@ public class Drivetrain extends SubsystemBase
 	public DifferentialDriveWheelSpeeds getWheelSpeeds() 
     {
         return new DifferentialDriveWheelSpeeds(Robot.drivetrain.getLeftEncoderVel(), Robot.drivetrain.getRightEncoderVel());
-    }
-}
+	}
+
+		public static final double ksVolts = 0.195;
+		public static final double kvVoltSecondsPerMeter = 0.0486;
+		public static final double kaVoltSecondsSquaredPerMeter = 0.00531;
+	
+		// Example value only - as above, this must be tuned for your drive!
+		public static final double kPDriveVel = 0.507;
+		public static final double kTrackwidthMeters = 1.1232503390357302;
+		public static final DifferentialDriveKinematics kDriveKinematics =
+			new DifferentialDriveKinematics(kTrackwidthMeters);
+		public static final double kMaxSpeedMetersPerSecond = 8;
+		public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+	
+		// Reasonable baseline values for a RAMSETE follower in units of meters and seconds
+		public static final double kRamseteB = 2;
+		public static final double kRamseteZeta = 0.7;
+
+	public Command getAutonomousCommand() 
+	{
+		var autoVoltageConstraint =
+		new DifferentialDriveVoltageConstraint(
+			new SimpleMotorFeedforward(ksVolts,
+									kvVoltSecondsPerMeter,
+									kaVoltSecondsSquaredPerMeter),
+			kDriveKinematics,
+			10);
+
+	// Create config for trajectory
+	TrajectoryConfig config =
+		new TrajectoryConfig(kMaxSpeedMetersPerSecond,
+							kMaxAccelerationMetersPerSecondSquared)
+			// Add kinematics to ensure max speed is actually obeyed
+			.setKinematics(kDriveKinematics)
+			// Apply the voltage constraint
+			.addConstraint(autoVoltageConstraint);
+
+	// An example trajectory to follow.  All units in meters.
+	Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+		// Start at the origin facing the +X direction
+		new Pose2d(0, 0, new Rotation2d(0)),
+		// Pass through these two interior waypoints, making an 's' curve path
+		List.of(
+			new Translation2d(1, 1),
+			new Translation2d(2, -1)
+		),
+		// End 3 meters straight ahead of where we started, facing forward
+		new Pose2d(3, 0, new Rotation2d(0)),
+		// Pass config
+		config
+	);
+	final Drivetrain m_robotDrive = new Drivetrain();
+
+	RamseteCommand ramseteCommand = new RamseteCommand(
+		exampleTrajectory,
+		m_robotDrive::getPose,
+		new RamseteController(kRamseteB, kRamseteZeta),
+		new SimpleMotorFeedforward(ksVolts,
+								kvVoltSecondsPerMeter,
+								kaVoltSecondsSquaredPerMeter),
+		kDriveKinematics,
+		m_robotDrive::getWheelSpeeds,
+		new PIDController(kPDriveVel, 0, 0),
+		new PIDController(kPDriveVel, 0, 0),
+		// RamseteCommand passes volts to the callback
+		m_robotDrive::tankDriveVolts,
+		m_robotDrive);
+
+		 // Run path following command, then stop at the end.
+		 return ramseteCommand.andThen(() -> m_robotDrive.tankDriveVolts(0, 0));
+	}
+	}
+
