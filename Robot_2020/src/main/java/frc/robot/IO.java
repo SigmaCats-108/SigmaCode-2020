@@ -19,7 +19,7 @@ public class IO
         m_buttonB = mainController.getRawButton(2);
         m_buttonX = mainController.getRawButton(3);
         m_buttonXRaw = mainController.getRawButton(3);
-        m_buttonY = mainController.getRawButtonPressed(4);
+        m_buttonY = mainController.getRawButton(4);
         m_leftBumper = mainController.getRawButton(5);
         m_leftBumperReleased = mainController.getRawButtonReleased(5);
         m_rightBumper = mainController.getRawButton(6);
@@ -35,31 +35,59 @@ public class IO
 
     public static void ProcessControllers()
     {
-        if(m_buttonB)
-        {
-            Robot.ballMech.bangBangShooter();
-        }
-        else
-        {
-            Robot.ballMech.stopShooter();
-        }
 
         // if(m_buttonB)
         // {
-        //     Robot.ballMech.setShooterMotors(0.3);
+        //     Robot.ballMech.bangBangShooter();
         // }
         // else
         // {
-        //     Robot.ballMech.setShooterMotors(0);
+        //     Robot.ballMech.stopShooter();
         // }
 
-        if(m_buttonX)
+        if(m_buttonB)
         {
-            Robot.ballMech.intake(-0.70);
+            Robot.ballMech.proportionalShooter();
         }
         else
         {
-            Robot.ballMech.stopIntake();
+            Robot.ballMech.setShooterMotors(0);
         }
+
+        // if(m_buttonX)
+        // {
+        //     Robot.sigmaSight.turnToTarget();
+        // }
+
+        // if(m_buttonX)
+        // {
+        //     Robot.ballMech.intake(0.70);
+        // }
+        // else
+        // {
+        //     Robot.ballMech.stopIntake();
+        // }
+
+        // if(m_buttonX)
+        // {
+        //     Robot.ballMech.intake(1.00);
+        // }
+        // else if(m_buttonA)
+        // {
+        //     Robot.ballMech.intake(0.75);
+        // }
+        // else if(m_buttonB)
+        // {
+        //     Robot.ballMech.intake(0.50);
+        // }
+        // else if(m_buttonY)
+        // {
+        //     Robot.ballMech.intake(0.25);
+        // }
+        // else
+        // {
+        //     Robot.ballMech.stopIntake();
+        // }
+
     }
 }

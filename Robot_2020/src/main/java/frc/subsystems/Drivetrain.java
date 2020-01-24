@@ -23,15 +23,14 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+
 import frc.robot.RobotMap;
 
+import com.ctre.phoenix.motorcontrol.*;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
-import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj2.command.Command;
 
 public class Drivetrain extends SubsystemBase
 {
@@ -42,6 +41,10 @@ public class Drivetrain extends SubsystemBase
 	private static CANSparkMax rightSparkMax1 = new CANSparkMax(RobotMap.DRIVETRAIN_RIGHT1, MotorType.kBrushless);
 	private static CANSparkMax rightSparkMax2 = new CANSparkMax(RobotMap.DRIVETRAIN_RIGHT2, MotorType.kBrushless);
 	private static CANSparkMax rightSparkMax3 = new CANSparkMax(RobotMap.DRIVETRAIN_RIGHT3, MotorType.kBrushless);
+
+	// private static TalonFX talonFX1 = new TalonFX(1);
+	// private static TalonFX talonFX2 = new TalonFX(2);
+	// private static TalonFX talonFX3 = new TalonFX(3);
 
 	private static CANEncoder leftEncoder = leftSparkMax1.getEncoder();
 	private static CANEncoder rightEncoder = rightSparkMax1.getEncoder();
@@ -76,6 +79,9 @@ public class Drivetrain extends SubsystemBase
 		rightSparkMax2.follow(rightSparkMax1);
 		rightSparkMax3.follow(rightSparkMax1);
 
+		// talonFX2.follow(talonFX1);
+		// talonFX3.follow(talonFX1);
+
 		// Assign DifferentialDrive Motors
 		drive = new DifferentialDrive(leftSparkMax1, rightSparkMax1);
 
@@ -91,7 +97,7 @@ public class Drivetrain extends SubsystemBase
 	 */
 	public void sigmaDrive(double leftSpeed, double rightSpeed)
 	{
-		drive.tankDrive(-leftSpeed /** RobotMap.DRIVETRAIN_LEFT_PGAIN*/, -rightSpeed, false);
+		drive.tankDrive(leftSpeed /** RobotMap.DRIVETRAIN_LEFT_PGAIN*/, rightSpeed, false);
 		// talonFX.set(ControlMode.PercentOutput, leftSpeed);
 		// rightSparkMax1.set(rightSpeed);
 	}
@@ -141,41 +147,17 @@ public class Drivetrain extends SubsystemBase
 		}
 
 		return false;
-
-		/*
-		double kp = 0.03; 
-		switch(moveState)
-		{
-			case 0:
-			targetEncVal = leftEncoder.getPosition() + (inches * ENC_TICKS_PER_INCH);
-			moveState = 1;
-			break;
-			
-			case 1:
-			double displacement = targetEncVal - leftEncoder.getPosition();
-			double move_command = displacement * kp;
-			sigmaDrive(move_command * -1, move_command * -1);
-			if(leftEncoder.getPosition() > targetEncVal - 5)
-			{
-				moveState = 2;
-			}
-			break;
-
-			case 2:
-			sigmaDrive(0.0, 0.0);
-		
-			return true;
-			
-		}
-		//System.out.println("moveState: " + moveState);
-		return false;
-		*/
 	}
 
 	public void update()
 	{
 
 	}
+
+	// public void talonTest(double speed)
+	// {
+	// 	talonFX1.set(ControlMode.PercentOutput, speed);
+	// }
 
 	/**
 	 * Turns the robot to a desired angle
@@ -291,21 +273,21 @@ public class Drivetrain extends SubsystemBase
         return new DifferentialDriveWheelSpeeds(Robot.drivetrain.getLeftEncoderVel(), Robot.drivetrain.getRightEncoderVel());
 	}
 
-		public static final double ksVolts = 0.195;
-		public static final double kvVoltSecondsPerMeter = 0.0486;
-		public static final double kaVoltSecondsSquaredPerMeter = 0.00531;
-	
-		// Example value only - as above, this must be tuned for your drive!
-		public static final double kPDriveVel = 0.507;
-		public static final double kTrackwidthMeters = 1.1232503390357302;
-		public static final DifferentialDriveKinematics kDriveKinematics =
-			new DifferentialDriveKinematics(kTrackwidthMeters);
-		public static final double kMaxSpeedMetersPerSecond = 8;
-		public static final double kMaxAccelerationMetersPerSecondSquared = 3;
-	
-		// Reasonable baseline values for a RAMSETE follower in units of meters and seconds
-		public static final double kRamseteB = 2;
-		public static final double kRamseteZeta = 0.7;
+	public static final double ksVolts = 0.195;
+	public static final double kvVoltSecondsPerMeter = 0.0486;
+	public static final double kaVoltSecondsSquaredPerMeter = 0.00531;
+
+	// Example value only - as above, this must be tuned for your drive!
+	public static final double kPDriveVel = 0.507;
+	public static final double kTrackwidthMeters = 1.1232503390357302;
+	public static final DifferentialDriveKinematics kDriveKinematics =
+		new DifferentialDriveKinematics(kTrackwidthMeters);
+	public static final double kMaxSpeedMetersPerSecond = 8;
+	public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+
+	// Reasonable baseline values for a RAMSETE follower in units of meters and seconds
+	public static final double kRamseteB = 2;
+	public static final double kRamseteZeta = 0.7;
 
 	public Command getAutonomousCommand() 
 	{
@@ -317,48 +299,47 @@ public class Drivetrain extends SubsystemBase
 			kDriveKinematics,
 			10);
 
-	// Create config for trajectory
-	TrajectoryConfig config =
-		new TrajectoryConfig(kMaxSpeedMetersPerSecond,
-							kMaxAccelerationMetersPerSecondSquared)
-			// Add kinematics to ensure max speed is actually obeyed
-			.setKinematics(kDriveKinematics)
-			// Apply the voltage constraint
-			.addConstraint(autoVoltageConstraint);
+		// Create config for trajectory
+		TrajectoryConfig config =
+			new TrajectoryConfig(kMaxSpeedMetersPerSecond,
+								kMaxAccelerationMetersPerSecondSquared)
+				// Add kinematics to ensure max speed is actually obeyed
+				.setKinematics(kDriveKinematics)
+				// Apply the voltage constraint
+				.addConstraint(autoVoltageConstraint);
 
-	// An example trajectory to follow.  All units in meters.
-	Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-		// Start at the origin facing the +X direction
-		new Pose2d(0, 0, new Rotation2d(0)),
-		// Pass through these two interior waypoints, making an 's' curve path
-		List.of(
-			new Translation2d(1, 1),
-			new Translation2d(2, -1)
-		),
-		// End 3 meters straight ahead of where we started, facing forward
-		new Pose2d(3, 0, new Rotation2d(0)),
-		// Pass config
-		config
-	);
-	final Drivetrain m_robotDrive = new Drivetrain();
+		// An example trajectory to follow.  All units in meters.
+		Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
+			// Start at the origin facing the +X direction
+			new Pose2d(0, 0, new Rotation2d(0)),
+			// Pass through these two interior waypoints, making an 's' curve path
+			List.of(
+				new Translation2d(1, 1),
+				new Translation2d(2, -1)
+			),
+			// End 3 meters straight ahead of where we started, facing forward
+			new Pose2d(3, 0, new Rotation2d(0)),
+			// Pass config
+			config
+		);
+		// final Drivetrain Robot.drivetrain = new Drivetrain();
 
-	RamseteCommand ramseteCommand = new RamseteCommand(
-		exampleTrajectory,
-		m_robotDrive::getPose,
-		new RamseteController(kRamseteB, kRamseteZeta),
-		new SimpleMotorFeedforward(ksVolts,
-								kvVoltSecondsPerMeter,
-								kaVoltSecondsSquaredPerMeter),
-		kDriveKinematics,
-		m_robotDrive::getWheelSpeeds,
-		new PIDController(kPDriveVel, 0, 0),
-		new PIDController(kPDriveVel, 0, 0),
-		// RamseteCommand passes volts to the callback
-		m_robotDrive::tankDriveVolts,
-		m_robotDrive);
+		RamseteCommand ramseteCommand = new RamseteCommand(
+			exampleTrajectory,
+			Robot.drivetrain::getPose,
+			new RamseteController(kRamseteB, kRamseteZeta),
+			new SimpleMotorFeedforward(ksVolts,
+									kvVoltSecondsPerMeter,
+									kaVoltSecondsSquaredPerMeter),
+			kDriveKinematics,
+			Robot.drivetrain::getWheelSpeeds,
+			new PIDController(kPDriveVel, 0, 0),
+			new PIDController(kPDriveVel, 0, 0),
+			// RamseteCommand passes volts to the callback
+			Robot.drivetrain::tankDriveVolts,
+			Robot.drivetrain);
 
-		 // Run path following command, then stop at the end.
-		 return ramseteCommand.andThen(() -> m_robotDrive.tankDriveVolts(0, 0));
+		// Run path following command, then stop at the end.
+		return ramseteCommand.andThen(() -> Robot.drivetrain.tankDriveVolts(0, 0));
 	}
-	}
-
+}
