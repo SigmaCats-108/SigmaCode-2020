@@ -45,14 +45,19 @@ public class IO
         //     Robot.ballMech.stopShooter();
         // }
 
-        if(m_buttonB)
-        {
-            Robot.ballMech.proportionalShooter();
-        }
-        else
-        {
-            Robot.ballMech.setShooterMotors(0);
-        }
+        // if(m_buttonB)
+        // {
+        //     Robot.ballMech.proportionalShooter();
+        // }
+        // else
+        // {
+        //     Robot.ballMech.setShooterMotors(0);
+        // }
+
+            if(m_buttonB)
+            {
+                Robot.drivetrain.getAutonomousCommand();
+            }
 
         // if(m_buttonX)
         // {
