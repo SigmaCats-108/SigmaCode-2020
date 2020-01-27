@@ -36,18 +36,9 @@ public class IO
     public static void ProcessControllers()
     {
 
-        // if(m_buttonB)
-        // {
-        //     Robot.ballMech.bangBangShooter();
-        // }
-        // else
-        // {
-        //     Robot.ballMech.stopShooter();
-        // }
-
-        if(m_buttonB)
+        if(m_leftBumper)
         {
-            Robot.ballMech.proportionalShooter();
+            Robot.ballMech.bangBangShooter();
         }
         else
         {
@@ -68,26 +59,26 @@ public class IO
         //     Robot.ballMech.stopIntake();
         // }
 
-        // if(m_buttonX)
-        // {
-        //     Robot.ballMech.intake(1.00);
-        // }
-        // else if(m_buttonA)
-        // {
-        //     Robot.ballMech.intake(0.75);
-        // }
-        // else if(m_buttonB)
-        // {
-        //     Robot.ballMech.intake(0.50);
-        // }
-        // else if(m_buttonY)
-        // {
-        //     Robot.ballMech.intake(0.25);
-        // }
-        // else
-        // {
-        //     Robot.ballMech.stopIntake();
-        // }
+        if(m_buttonX)
+        {
+            Robot.ballMech.intake(1.00);
+        }
+        else if(m_buttonA)
+        {
+            Robot.ballMech.intake(0.75);
+        }
+        else if(m_buttonB)
+        {
+            Robot.ballMech.intake(0.50);
+        }
+        else if(m_buttonY)
+        {
+            Robot.ballMech.intake(0.25);
+        }
+        else
+        {
+            Robot.ballMech.stopIntake();
+        }
 
     }
 }
