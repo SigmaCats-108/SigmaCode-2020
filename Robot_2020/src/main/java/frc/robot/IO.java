@@ -1,6 +1,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.XboxController;
+import frc.subsystems.SigmaSight;
 
 public class IO
 {
@@ -38,12 +39,19 @@ public class IO
 
         if(m_leftBumper)
         {
-            Robot.ballMech.bangBangShooter();
+            Robot.ballMech.shootSequence();
         }
         else
         {
-            Robot.ballMech.setShooterMotors(0);
+            Robot.ballMech.stopShooter();
+            Robot.ballMech.shooterState = 0;
         }
+
+        if(m_buttonX)
+        {
+            Robot.sigmaSight.turnToTarget();
+        }
+  
 
         // if(m_buttonX)
         // {
@@ -59,26 +67,26 @@ public class IO
         //     Robot.ballMech.stopIntake();
         // }
 
-        if(m_buttonX)
-        {
-            Robot.ballMech.intake(1.00);
-        }
-        else if(m_buttonA)
-        {
-            Robot.ballMech.intake(0.75);
-        }
-        else if(m_buttonB)
-        {
-            Robot.ballMech.intake(0.50);
-        }
-        else if(m_buttonY)
-        {
-            Robot.ballMech.intake(0.25);
-        }
-        else
-        {
-            Robot.ballMech.stopIntake();
-        }
+        // if(m_buttonX)
+        // {
+        //     Robot.ballMech.intake(1.00);
+        // }
+        // else if(m_buttonA)
+        // {
+        //     Robot.ballMech.intake(0.75);
+        // }
+        // else if(m_buttonB)
+        // {
+        //     Robot.ballMech.intake(0.50);
+        // }
+        // else if(m_buttonY)
+        // {
+        //     Robot.ballMech.intake(0.25);
+        // }
+        // else
+        // {
+        //     Robot.ballMech.stopIntake();
+        // }
 
     }
 }

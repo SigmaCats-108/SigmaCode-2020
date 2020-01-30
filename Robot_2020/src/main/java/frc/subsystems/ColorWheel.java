@@ -3,7 +3,11 @@ package frc.subsystems;
 import edu.wpi.first.wpilibj.GenericHID;
 
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+
 import com.revrobotics.ColorSensorV3;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorMatch;
 import edu.wpi.first.wpilibj.util.Color;
@@ -11,8 +15,16 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.IO;
 
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANEncoder;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+
 public class ColorWheel
 {
+	private CANSparkMax WOFmotor = new CANSparkMax(57, MotorType.kBrushless);
+	private CANEncoder WOFencoder = WOFmotor.getEncoder();
+	private DoubleSolenoid WOFCylinder = new DoubleSolenoid(0,1);
+
 	private static final I2C.Port i2cPort = I2C.Port.kOnboard;
 	private static final ColorSensorV3 colorSensor = new ColorSensorV3(i2cPort);
 	private final ColorMatch m_colorMatcher = new ColorMatch();
@@ -63,6 +75,31 @@ public class ColorWheel
 		}
 	}
 
+	private void WOFCylinder()
+	{
+		if(WOFCylinder.get() == Value.kForward)
+		{
+			WOFCylinder.set(Value.kReverse);
+		}
+		else
+		{
+			WOFCylinder.set(Value.kForward);
+		}
+	}
+
+	public void rotationControl(int position)
+	{
+		if(WOFencoder.getPosition() < position)
+		{
+			WOFmotor.set(1);
+		}
+		else
+		{
+			WOFmotor.set(0);
+			IO.mainController.setRumble(RumbleType.kLeftRumble, 1.0);
+		}
+	}
+
 	public void positionControl()
 	{
 		String gameData = DriverStation.getInstance().getGameSpecificMessage();
@@ -73,7 +110,7 @@ public class ColorWheel
 			case 'B' :
 			if(match.color != kBlueTarget)
 			{
-				//move motors
+				WOFmotor.set(0.5);
 				System.out.println("Blue");
 			}
 			else

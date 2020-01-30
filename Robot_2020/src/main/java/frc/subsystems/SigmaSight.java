@@ -86,7 +86,14 @@ public class SigmaSight
     public void turnToTarget()
     {
         steering_adjust = turnKp * xVal;
-        Robot.drivetrain.sigmaDrive(-steering_adjust, steering_adjust);
+        Robot.drivetrain.sigmaDrive(steering_adjust, -steering_adjust);
+    }
+
+    public boolean lineUpToShoot()
+    {
+        steering_adjust = turnKp * xVal;
+        Robot.drivetrain.sigmaDrive(steering_adjust, -steering_adjust);
+        return Math.abs(xVal) < 1;
     }
     
     /**
@@ -125,5 +132,10 @@ public class SigmaSight
         SmartDashboard.putNumber("ty", yVal);
         SmartDashboard.putNumber("ta", area);
         SmartDashboard.putNumber("ts", skew);
+    }
+
+    public double getArea()
+    {
+        return area;
     }
 }

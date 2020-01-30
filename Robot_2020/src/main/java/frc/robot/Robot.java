@@ -15,7 +15,7 @@ public class Robot extends TimedRobot
     public static SigmaSight sigmaSight;  
     public static Drivetrain drivetrain;
     public static NavX navX;
-    // public static ColorWheel wheelOfFortune;
+    public static ColorWheel wheelOfFortune;
     public static BallMech ballMech;
     private Command m_autonomousCommand;
 
@@ -25,7 +25,7 @@ public class Robot extends TimedRobot
         sigmaSight = new SigmaSight();
         drivetrain = new Drivetrain();
         navX = new NavX();
-        // wheelOfFortune = new ColorWheel();
+        wheelOfFortune = new ColorWheel();
         ballMech = new BallMech();
     }
 

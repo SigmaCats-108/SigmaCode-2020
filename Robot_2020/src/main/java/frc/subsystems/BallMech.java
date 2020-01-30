@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import frc.robot.IO;
+import frc.robot.Robot;
 import frc.robot.RobotMap;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -22,7 +23,9 @@ public class BallMech
 {
 	private CANSparkMax shooterMotor1 = new CANSparkMax(8, MotorType.kBrushless);
 	private CANSparkMax shooterMotor2 = new CANSparkMax(9, MotorType.kBrushless);
-	private CANSparkMax intakeMotor = new CANSparkMax(10, MotorType.kBrushless);
+	private CANSparkMax intakeMotor = new CANSparkMax(16, MotorType.kBrushless);
+	private CANSparkMax rollerMotor = new CANSparkMax(11, MotorType.kBrushed);
+	private CANSparkMax indexMotor = new CANSparkMax(10, MotorType.kBrushless);
 
 	private CANEncoder shooterEncoder = shooterMotor1.getEncoder();
 
@@ -45,11 +48,13 @@ public class BallMech
 	public void intake(double speed)
 	{
 		intakeMotor.set(speed);
+		rollerMotor.set(speed);
 	}
 
 	public void stopIntake()
 	{
 		intakeMotor.set(0);
+		rollerMotor.set(0);
 	}
 
 	public void talonTest(double speed)
@@ -57,102 +62,47 @@ public class BallMech
 		// talonFX.set(ControlMode.PercentOutput, speed);
 	}
 
-	double speed = 1.0;
-	float kp = 0.0008f; 				// proportional konstant
-	float ki = .0f;   			//konstant of integration
-	float kd =  .5f; 			//konstant of derivation
-	float current = 0;
-	float integralActiveZone = 2;	// zone of error values in which the total error for the                    integral term accumulates
-	float errorT;						// total error accumulated
-	float lastError;					// last error recorded by the controller
-	float proportion;						// the proportional term
-	float integral;							// the integral term
-	float derivative;
-	public void shoot()
-	{
-		float error = 3000 - (float)shooterEncoder.getVelocity(); // calculates difference between current velocity and target velocity
-
-		if(error <integralActiveZone && errorT != 0)// total error only accumulates where        ///there is error, and when the error is 
-								//within the integral active zone
-		{
-			errorT += error;// adds error to the total each time through the loop
-		}
-		else{
-			errorT = 0;// if error = zero or error is not withing the active zone, total       ///error is set to zero
-		}
-
-		if(errorT > 50/ki) //caps total error at 50
-		{
-			errorT = 50/ki;
-		}
-		if(error == 0){
-			derivative = 0; // if error is zero derivative term is zero
-		}
-		proportion 	 =     error             * kp; // sets proportion term
-		integral 		 =     errorT            * ki;// sets integral term
-		derivative   =    (error - lastError)* kd;// sets derivative term
-
-		lastError = error; // sets the last error to current error so we can use it in the next loop
-
-		current =  proportion + integral + derivative;// sets value current as total of all terms
-
-		setShooterMotors(current); // sets motors to the calculated value
-	}
-	
-	
+	double shooterSpeed = 1.0;
 	int count = 0;
-	public void bangBangShooter()
+	public void shoot(double desired_RPM )
 	{
 		count++;
-		double desired_RPM = 3000;
-		// double actual_RPM = talonFX.getSelectedSensorVelocity();
 		double actual_RPM = shooterEncoder.getVelocity();
 		System.out.println("actualRPM " + actual_RPM);
 		if(actual_RPM==0)
 			setShooterMotors(1);
-			
-		// if(actual_RPM <= desired_RPM)
-		// {
-		// 	setShooterMotors(speed);
-		// }
-		// else
-		// {	
-			if(count == 25)
-			{
-				double RPM_error = actual_RPM - desired_RPM;
-				double percentDifference = RPM_error / desired_RPM;
-				speed -= percentDifference * 0.35;
-				if(speed > 1)
-					speed = 1;
+	
+		if(count == 10)
+		{
+			double RPM_error = actual_RPM - desired_RPM ;
+			double percentDifference = RPM_error / desired_RPM ;
+			shooterSpeed -= percentDifference * 0.35;
+			if(shooterSpeed > 1)
+			shooterSpeed = 1;
 
-				if(speed < -1)
-					speed = -1;
-				setShooterMotors(speed);
-				count = 0;
-				System.out.println("CHANGINE SPEED");
-				System.out.println("RPM_error " + RPM_error);
-				System.out.println("percentDifference " + percentDifference);
-				System.out.println("---------------");
-			}
-			System.out.println("speed " + speed);
-
-			
+			if(shooterSpeed < -1)
+			shooterSpeed = -1;
+			setShooterMotors(shooterSpeed);
+			count = 0;
+			System.out.println("CHANGING SPEED");
+			System.out.println("RPM_error " + RPM_error);
+			System.out.println("percentDifference " + percentDifference);
+			System.out.println("---------------");
 		}
+		System.out.println("shooterSpeed " + shooterSpeed);
+	}
 
-	public void proportionalShooter()
+
+
+	public boolean runIndexer(double RPM)
 	{
-		double desired_RPM = 3000;
-		double RPM_error = desired_RPM - shooterEncoder.getVelocity();
-		double shootKP = 0.0003;
-		double speed = 0;
-		speed += shootKP * RPM_error;
-		double speedError = (1 - speed) * .002;
-		setShooterMotors(speed - speedError);
-		System.out.println("RPM_error " + RPM_error);
-		System.out.println("speed " + speed);
-		System.out.println("speedError " + speedError);
-		System.out.println("Velocity " + shooterEncoder.getVelocity());
-		System.out.println("Speed - speedError " + (speed - speedError));
+		if(shooterEncoder.getVelocity() > RPM - 100 && shooterEncoder.getVelocity() < RPM + 100)
+		{
+			indexMotor.set(0.5);
+			return true;
+		}
+		indexMotor.set(0);
+		return false;
 	}
 
 	public void setShooterMotors(double speed)
@@ -165,10 +115,43 @@ public class BallMech
 	public void stopShooter()
 	{
 		setShooterMotors(0);
+		indexMotor.set(0);
 	}
 
 	// public void extendIntake()
 	// {
 	// 	intakeCylinder.set(Value.kForward);
 	// }
+
+	public int shooterState = 0;
+	private double required_RPM = 0;
+	public boolean shootSequence()
+	{
+		switch(shooterState)
+		{
+			case 0:
+			// if (Robot.sigmaSight.lineUpToShoot())
+			// {
+			// 	shooterState = 1;
+			// }
+			shooterState = 1;
+			break;
+
+			case 1:
+			required_RPM = Robot.sigmaSight.area * 600;
+			shoot(3000);
+			shooterState = 2;
+			break;
+
+			case 2:
+			shoot(3000);
+			if(runIndexer(3000))
+			{
+				shooterState = 1;
+			}
+			break;
+		}
+
+		return false;
+	}
 }
