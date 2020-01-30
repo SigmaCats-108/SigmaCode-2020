@@ -21,95 +21,38 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class BallMech
 {
-	private CANSparkMax shooterMotor1 = new CANSparkMax(8, MotorType.kBrushless);
-	private CANSparkMax shooterMotor2 = new CANSparkMax(9, MotorType.kBrushless);
+	private TalonFX shooterMotor1 = new TalonFX(8);
 	private CANSparkMax intakeMotor = new CANSparkMax(16, MotorType.kBrushless);
 	private CANSparkMax rollerMotor = new CANSparkMax(11, MotorType.kBrushed);
 	private CANSparkMax indexMotor = new CANSparkMax(10, MotorType.kBrushless);
-
-	private CANEncoder shooterEncoder = shooterMotor1.getEncoder();
-
-	// private static TalonFX talonFX = new TalonFX(0);
+	private DoubleSolenoid intakeCylinder = new DoubleSolenoid(2,3);
+	private AnalogInput ballSensor_intake = new AnalogInput(0);
+	private AnalogInput ballSensor_indexer = new AnalogInput(1);
 	
 	public BallMech()
 	{
-		// talonFX.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 10);
-		// talonFX.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_1Ms);
+		shooterMotor1.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 10);
+		shooterMotor1.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_1Ms);
 	}
 
 	public void update()
 	{
-		SmartDashboard.putNumber("Shooter velocity", shooterEncoder.getVelocity());
-		// System.out.println("OpenRampRate " + shooterMotor1.getOpenLoopRampRate());
-		// System.out.println("ClosedRampRate " + shooterMotor1.getClosedLoopRampRate());
-		// talonFX.set(TalonFXControlMode.Velocity,3000);
+
 	}
 
 	public void intake(double speed)
 	{
 		intakeMotor.set(speed);
-		rollerMotor.set(speed);
 	}
 
 	public void stopIntake()
 	{
 		intakeMotor.set(0);
-		rollerMotor.set(0);
 	}
 
-	public void talonTest(double speed)
+	private void setShooterMotors(double speed)
 	{
-		// talonFX.set(ControlMode.PercentOutput, speed);
-	}
-
-	double shooterSpeed = 1.0;
-	int count = 0;
-	public void shoot(double desired_RPM )
-	{
-		count++;
-		double actual_RPM = shooterEncoder.getVelocity();
-		System.out.println("actualRPM " + actual_RPM);
-		if(actual_RPM==0)
-			setShooterMotors(1);
-	
-		if(count == 10)
-		{
-			double RPM_error = actual_RPM - desired_RPM ;
-			double percentDifference = RPM_error / desired_RPM ;
-			shooterSpeed -= percentDifference * 0.35;
-			if(shooterSpeed > 1)
-			shooterSpeed = 1;
-
-			if(shooterSpeed < -1)
-			shooterSpeed = -1;
-			setShooterMotors(shooterSpeed);
-			count = 0;
-			System.out.println("CHANGING SPEED");
-			System.out.println("RPM_error " + RPM_error);
-			System.out.println("percentDifference " + percentDifference);
-			System.out.println("---------------");
-		}
-		System.out.println("shooterSpeed " + shooterSpeed);
-	}
-
-
-
-	public boolean runIndexer(double RPM)
-	{
-		if(shooterEncoder.getVelocity() > RPM - 100 && shooterEncoder.getVelocity() < RPM + 100)
-		{
-			indexMotor.set(0.5);
-			return true;
-		}
-		indexMotor.set(0);
-		return false;
-	}
-
-	public void setShooterMotors(double speed)
-	{
-		// talonFX.set(ControlMode.PercentOutput, speed);
-		shooterMotor1.set(speed);
-		shooterMotor2.set(-speed);
+		shooterMotor1.set(ControlMode.PercentOutput, speed);
 	}
 
 	public void stopShooter()
@@ -118,11 +61,46 @@ public class BallMech
 		indexMotor.set(0);
 	}
 
-	// public void extendIntake()
-	// {
-	// 	intakeCylinder.set(Value.kForward);
-	// }
+	private void runRoller()
+	{
+		 
+	}
 
+	int state = 0;
+	private int ballCount()
+	{
+		int ballCount = 0;
+		switch(state)
+		{
+			case 0:
+			if(ballSensor_intake.getVoltage() < 5)
+			{
+				ballCount++;
+				state = 1;
+			}
+			break;
+
+			case 1:
+			if(ballSensor_intake.getVoltage() > 10)
+			{
+				state = 0;
+			}
+			break;
+		}
+		return ballCount;
+	}
+
+	public void extendIntake()
+	{
+		if(intakeCylinder.get() == Value.kForward)
+		{	
+			intakeCylinder.set(Value.kReverse);
+		}
+		else
+		{
+			intakeCylinder.set(Value.kForward);
+		}
+	}
 	public int shooterState = 0;
 	private double required_RPM = 0;
 	public boolean shootSequence()
@@ -130,25 +108,18 @@ public class BallMech
 		switch(shooterState)
 		{
 			case 0:
-			// if (Robot.sigmaSight.lineUpToShoot())
-			// {
-			// 	shooterState = 1;
-			// }
-			shooterState = 1;
-			break;
-
-			case 1:
-			required_RPM = Robot.sigmaSight.area * 600;
-			shoot(3000);
-			shooterState = 2;
-			break;
-
-			case 2:
-			shoot(3000);
-			if(runIndexer(3000))
+			if (Robot.sigmaSight.lineUpToShoot())
 			{
 				shooterState = 1;
 			}
+			break;
+
+			case 1:
+
+			break;
+
+			case 2:
+
 			break;
 		}
 
