@@ -138,4 +138,19 @@ public class SigmaSight
     {
         return area;
     }
+
+    double targetHeight = 12;
+    double limelightHeight = 12;
+    double mountAngle = 5;
+
+    public double distance()
+    {
+        return (targetHeight - limelightHeight) / Math.tan(mountAngle - yVal);
+    }
+
+
+	public double desiredSpeed()
+	{
+        return 4698.373 +  0.00435206 * Math.pow(Math.E, 0.4609538 * Math.abs(yVal));
+	}
 }

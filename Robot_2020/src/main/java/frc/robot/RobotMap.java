@@ -33,6 +33,14 @@ public class RobotMap
 	public static final double HATCH_VISION_MIN_AIM_COMMAND = 0.0;
 	public static final double HATCH_VISION_DESIRED_TARGET_AREA = 4.0;	
 
+
+	public static final int kPIDLoopIdx = 0;
+	public static final double kF = 0.051;
+	public static final double kP = 0.127;
+	public static final double kI = 0.001;
+	public static final double kD = 0.1;
+	public static final int kTimeoutMs = 0;
+
 	// ENUMS
 	public enum ArmPosition 
 	{

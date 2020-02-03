@@ -87,6 +87,8 @@ public class Drivetrain extends SubsystemBase
 
 		// Sets drivetrain deadband, default is 0.02
 		drive.setDeadband(0.03);
+
+		// talonFX1.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
 	}
 
 	/**

@@ -1,6 +1,9 @@
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.subsystems.SigmaSight;
 
 public class IO
@@ -13,14 +16,15 @@ public class IO
     public static double m_leftTrigger, m_rightTrigger, m_leftAnalogX, m_rightAnalogX, m_leftAnalogY, m_rightAnalogY;
     public static boolean o_buttonA, o_buttonB, o_buttonX, o_buttonXReleased, o_buttonY, o_leftBumper, o_rightBumper, o_leftStick, o_rightStick;
     public static double o_leftTrigger, o_rightTrigger, o_leftAnalogX, o_rightAnalogX, o_leftAnalogY, o_rightAnalogY;
+    static double  rpm = 2000;
 
     public static void UpdateControllers()
     {
-        m_buttonA = mainController.getRawButton(1);
+        m_buttonA = mainController.getRawButtonPressed(1);
         m_buttonB = mainController.getRawButton(2);
         m_buttonX = mainController.getRawButton(3);
         m_buttonXRaw = mainController.getRawButton(3);
-        m_buttonY = mainController.getRawButton(4);
+        m_buttonY = mainController.getRawButtonPressed(4);
         m_leftBumper = mainController.getRawButton(5);
         m_leftBumperReleased = mainController.getRawButtonReleased(5);
         m_rightBumper = mainController.getRawButton(6);
@@ -34,20 +38,25 @@ public class IO
         m_rightAnalogY = mainController.getRawAxis(5);
     }
 
+    public static void update()
+    {
+        SmartDashboard.putNumber("rpm", rpm);
+    }
+
     public static void ProcessControllers()
     {
 
-        if(m_leftBumper)
-        {
-            Robot.ballMech.shootSequence();
-        }
-        else
-        {
-            Robot.ballMech.stopShooter();
-            Robot.ballMech.shooterState = 0;
-        }
+        // if(m_leftBumper)
+        // {
+        //     Robot.ballMech.shoot(4000);
+        // }
+        // else
+        // {
+        //     Robot.ballMech.stopShooter();
+        //     Robot.ballMech.shooterState = 0;
+        // }
 
-        if(m_buttonX)
+        if(m_leftBumper)
         {
             Robot.sigmaSight.turnToTarget();
         }
@@ -67,26 +76,56 @@ public class IO
         //     Robot.ballMech.stopIntake();
         // }
 
+
         // if(m_buttonX)
         // {
-        //     Robot.ballMech.intake(1.00);
+        //     Robot.ballMech.shoot(5000);
         // }
         // else if(m_buttonA)
         // {
-        //     Robot.ballMech.intake(0.75);
+        //     Robot.ballMech.shoot(4000);
         // }
         // else if(m_buttonB)
         // {
-        //     Robot.ballMech.intake(0.50);
+        //     Robot.ballMech.shoot(3000);
         // }
         // else if(m_buttonY)
         // {
-        //     Robot.ballMech.intake(0.25);
+        //     Robot.ballMech.shoot(2000);
         // }
         // else
         // {
-        //     Robot.ballMech.stopIntake();
+        //     Robot.ballMech.stopShooter();
         // }
+
+
+        // if(m_buttonY)
+        // {
+        //     rpm += 100;
+        // }
+        // if(m_buttonA)
+        // {
+        //     rpm -= 100;
+        // }
+        // if(m_buttonX)
+        // {
+        //     Robot.ballMech.shoot(rpm);
+        // }
+        // else
+        // {
+        //     Robot.ballMech.stopShooter();
+            
+        // }
+
+        if(m_buttonX)
+        {
+            Robot.ballMech.variableDistanceShooter(Robot.sigmaSight.desiredSpeed());
+        }
+        else
+        {
+            Robot.ballMech.stopShooter();
+        }
+
 
     }
 }

@@ -39,6 +39,7 @@ public class Robot extends TimedRobot
         drivetrain.update();
         navX.updateAHRS();
         ballMech.update();
+        IO.update();
     }
     
     @Override
