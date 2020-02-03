@@ -72,7 +72,6 @@ public class Robot extends TimedRobot
     {
         IO.UpdateControllers();
         drivetrain.sigmaDrive(IO.m_leftAnalogY, IO.m_rightAnalogY);
-        // ballMech.talonTest(IO.m_rightAnalogY);
         IO.ProcessControllers();
       
     }

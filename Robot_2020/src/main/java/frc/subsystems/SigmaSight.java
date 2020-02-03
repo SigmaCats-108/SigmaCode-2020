@@ -134,8 +134,8 @@ public class SigmaSight
         SmartDashboard.putNumber("ts", skew);
     }
 
-    public double getArea()
-    {
-        return area;
-    }
+	public double desiredSpeed()
+	{
+        return 4698.373 +  0.00435206 * Math.pow(Math.E, 0.4609538 * Math.abs(yVal));
+	}
 }

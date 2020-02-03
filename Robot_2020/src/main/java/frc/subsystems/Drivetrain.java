@@ -1,7 +1,5 @@
 package frc.subsystems;
 
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
@@ -19,11 +17,6 @@ import java.util.List;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import frc.robot.Robot;
 
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.IdleMode;
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 import frc.robot.RobotMap;
 
 import com.ctre.phoenix.motorcontrol.*;
@@ -31,29 +24,22 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class Drivetrain extends SubsystemBase
 {
 	// Motor Controller Declarations
-	private static CANSparkMax leftSparkMax1 = new CANSparkMax(RobotMap.DRIVETRAIN_LEFT1, MotorType.kBrushless);
-	private static CANSparkMax leftSparkMax2 = new CANSparkMax(RobotMap.DRIVETRAIN_LEFT2, MotorType.kBrushless);
-	private static CANSparkMax leftSparkMax3 = new CANSparkMax(RobotMap.DRIVETRAIN_LEFT3, MotorType.kBrushless);
-	private static CANSparkMax rightSparkMax1 = new CANSparkMax(RobotMap.DRIVETRAIN_RIGHT1, MotorType.kBrushless);
-	private static CANSparkMax rightSparkMax2 = new CANSparkMax(RobotMap.DRIVETRAIN_RIGHT2, MotorType.kBrushless);
-	private static CANSparkMax rightSparkMax3 = new CANSparkMax(RobotMap.DRIVETRAIN_RIGHT3, MotorType.kBrushless);
-
-	// private static TalonFX talonFX1 = new TalonFX(1);
-	// private static TalonFX talonFX2 = new TalonFX(2);
-	// private static TalonFX talonFX3 = new TalonFX(3);
-
-	private static CANEncoder leftEncoder = leftSparkMax1.getEncoder();
-	private static CANEncoder rightEncoder = rightSparkMax1.getEncoder();
+	private TalonFX rightTalon1  = new TalonFX(RobotMap.DRIVETRAIN_RIGHT1);
+	private TalonFX rightTalon2  = new TalonFX(RobotMap.DRIVETRAIN_RIGHT2);
+	private TalonFX rightTalon3  = new TalonFX(RobotMap.DRIVETRAIN_RIGHT3);
+	private TalonFX leftTalon1  = new TalonFX(RobotMap.DRIVETRAIN_LEFT1);
+	private TalonFX leftTalon2  = new TalonFX(RobotMap.DRIVETRAIN_LEFT2);
+	private TalonFX leftTalon3  = new TalonFX(RobotMap.DRIVETRAIN_LEFT3);
+	
 
 	// Odometry class for tracking robot pose
 	private DifferentialDriveOdometry m_odometry;
 	
-	private DifferentialDrive drive;
-
 	// private static DoubleSolenoid gearShifter = new DoubleSolenoid(RobotMap.PCM1, RobotMap.DRIVETRAIN_SHIFTER_FWD, RobotMap.DRIVETRAIN_SHIFTER_REV);
 
 	private double angleError, turnSpeed, targetEncVal = 0;
@@ -62,31 +48,12 @@ public class Drivetrain extends SubsystemBase
 	public int turnState = 0;
 	private final double ENC_TICKS_PER_INCH = 58.4 / 60;
 
-
 	public Drivetrain()
 	{
-		// Set drivetrain motors to coast
-		leftSparkMax1.setIdleMode(IdleMode.kCoast);
-		leftSparkMax2.setIdleMode(IdleMode.kCoast);
-		leftSparkMax3.setIdleMode(IdleMode.kCoast);
-		rightSparkMax1.setIdleMode(IdleMode.kCoast);
-		rightSparkMax2.setIdleMode(IdleMode.kCoast);
-		rightSparkMax3.setIdleMode(IdleMode.kCoast);
-
-		// Set up followers
-		leftSparkMax2.follow(leftSparkMax1);
-		leftSparkMax3.follow(leftSparkMax1);
-		rightSparkMax2.follow(rightSparkMax1);
-		rightSparkMax3.follow(rightSparkMax1);
-
-		// talonFX2.follow(talonFX1);
-		// talonFX3.follow(talonFX1);
-
-		// Assign DifferentialDrive Motors
-		drive = new DifferentialDrive(leftSparkMax1, rightSparkMax1);
-
-		// Sets drivetrain deadband, default is 0.02
-		drive.setDeadband(0.03);
+		rightTalon2.follow(rightTalon1);
+		rightTalon3.follow(rightTalon1);
+		leftTalon2.follow(leftTalon1);
+		leftTalon3.follow(leftTalon1);
 	}
 
 	/**
@@ -97,9 +64,8 @@ public class Drivetrain extends SubsystemBase
 	 */
 	public void sigmaDrive(double leftSpeed, double rightSpeed)
 	{
-		drive.tankDrive(leftSpeed /** RobotMap.DRIVETRAIN_LEFT_PGAIN*/, rightSpeed, false);
-		// talonFX.set(ControlMode.PercentOutput, leftSpeed);
-		// rightSparkMax1.set(rightSpeed);
+		rightTalon1.set(ControlMode.PercentOutput, rightSpeed);
+		leftTalon1.set(ControlMode.PercentOutput, leftSpeed);
 	}
 
 	/**
@@ -128,13 +94,13 @@ public class Drivetrain extends SubsystemBase
 		switch(moveState)
 		{
 			case 0:
-			targetEncVal = leftEncoder.getPosition() + (inches * ENC_TICKS_PER_INCH);
+			targetEncVal = rightTalon1.getSelectedSensorPosition() + (inches * ENC_TICKS_PER_INCH);
 			moveState = 1;
 			break;
 			
 			case 1:
 			sigmaDrive(-0.35, -0.35);
-			if(leftEncoder.getPosition() > targetEncVal - 5)
+			if(rightTalon1.getSelectedSensorPosition() > targetEncVal - 5)
 			{
 				moveState = 2;
 			}
@@ -241,26 +207,26 @@ public class Drivetrain extends SubsystemBase
 
 	public double getLeftEncoderVel()
 	{
-		return leftEncoder.getVelocity();
+		return rightTalon1.getSelectedSensorVelocity();
 	}
 	public double getRightEncoderVel()
 	{
-		return rightEncoder.getVelocity();
+		return rightTalon1.getSelectedSensorVelocity();
 	}
 
 	public double getLeftEncoder()
 	{
-		return leftEncoder.getPosition();
+		return rightTalon1.getSelectedSensorVelocity();
 	}
 	public double getRightEncoder()
 	{
-		return rightEncoder.getPosition();
+		return rightTalon1.getSelectedSensorVelocity();
 	}
 
 	public void tankDriveVolts(double leftVolts, double rightVolts) 
 	{
-		leftSparkMax1.setVoltage(leftVolts);
-		rightSparkMax1.setVoltage(rightVolts);
+		// leftSparkMax1.setVoltage(leftVolts);
+		// rightSparkMax1.setVoltage(rightVolts);
 	}
 	  
     public Pose2d getPose() 
