@@ -24,7 +24,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
+// import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class Drivetrain extends SubsystemBase
 {
@@ -54,6 +54,10 @@ public class Drivetrain extends SubsystemBase
 		rightTalon3.follow(rightTalon1);
 		leftTalon2.follow(leftTalon1);
 		leftTalon3.follow(leftTalon1);
+
+		rightTalon1.setInverted(true);
+		rightTalon2.setInverted(InvertType.FollowMaster);
+		rightTalon3.setInverted(InvertType.FollowMaster);
 	}
 
 	/**

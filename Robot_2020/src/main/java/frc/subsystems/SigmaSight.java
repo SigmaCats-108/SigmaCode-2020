@@ -137,5 +137,10 @@ public class SigmaSight
 	public double desiredSpeed()
 	{
         return 4698.373 +  0.00435206 * Math.pow(Math.E, 0.4609538 * Math.abs(yVal));
-	}
+    }
+    
+    public boolean inRange()
+    {
+        return yVal > 10 && yVal < 30;
+    }
 }

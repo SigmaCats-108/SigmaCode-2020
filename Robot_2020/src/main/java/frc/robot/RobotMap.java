@@ -10,12 +10,12 @@ public class RobotMap
 	public static final int ROBOT_WHEEL_DIAMETER = 2;
 
 	// Drivetrain ID Values
-	public static final int DRIVETRAIN_LEFT1 = 4;
-	public static final int DRIVETRAIN_LEFT2 = 5;
-	public static final int DRIVETRAIN_LEFT3 = 6;
-	public static final int DRIVETRAIN_RIGHT1 = 1;
-	public static final int DRIVETRAIN_RIGHT2 = 2;
-	public static final int DRIVETRAIN_RIGHT3 = 3;
+	public static final int DRIVETRAIN_RIGHT1 = 4;
+	public static final int DRIVETRAIN_RIGHT2 = 5;
+	public static final int DRIVETRAIN_RIGHT3 = 6;
+	public static final int DRIVETRAIN_LEFT1 = 1;
+	public static final int DRIVETRAIN_LEFT2 = 2;
+	public static final int DRIVETRAIN_LEFT3 = 3;
 
 	// BallMech ID Values
 	public static final int BALLMECH_INTAKE = 9;
@@ -36,4 +36,11 @@ public class RobotMap
 	public static final double kI = 0.001;
 	public static final double kD = 0.1;
 	public static final int kTimeoutMs = 0;
+
+	//Pneumatics
+	public static final int PCM1 = 0;
+	public static final int PCM2 = 1;
+
+	// public static final int PCM2 = 1;
+
 }
