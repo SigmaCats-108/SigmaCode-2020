@@ -41,6 +41,15 @@ public class RobotMap
 	public static final int PCM1 = 0;
 	public static final int PCM2 = 1;
 
-	// public static final int PCM2 = 1;
+	public static final int DRIVETRAIN_SHIFTER_FWD = 6;
+	public static final int DRIVETRAIN_SHIFTER_REV = 1;
+	public static final int INTAKE_EXTENDER_FWD = 2;
+	public static final int INTAKE_EXTENDER_REV = 5;
+
+	//white - hanger
+	//purple - intake
+	//gray - gearbox
+
+	
 
 }
