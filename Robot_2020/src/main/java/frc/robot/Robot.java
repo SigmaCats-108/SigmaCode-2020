@@ -9,6 +9,7 @@ import frc.subsystems.ColorWheel;
 import frc.subsystems.Drivetrain;
 import frc.SensorInputs.NavX;
 import frc.subsystems.BallMech;
+import frc.subsystems.ClimbMech;
 
 public class Robot extends TimedRobot 
 {
@@ -17,6 +18,7 @@ public class Robot extends TimedRobot
     public static NavX navX;
     public static ColorWheel wheelOfFortune;
     public static BallMech ballMech;
+    public static ClimbMech climbMech;
     private Command m_autonomousCommand;
 
     @Override
@@ -27,6 +29,7 @@ public class Robot extends TimedRobot
         navX = new NavX();
         wheelOfFortune = new ColorWheel();
         ballMech = new BallMech();
+        climbMech = new ClimbMech();
     }
 
     @Override

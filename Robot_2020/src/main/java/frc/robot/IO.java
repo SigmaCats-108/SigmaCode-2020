@@ -23,7 +23,7 @@ public class IO
         m_buttonY = mainController.getRawButton(4);
         m_leftBumper = mainController.getRawButton(5);
         m_leftBumperReleased = mainController.getRawButtonReleased(5);
-        m_rightBumper = mainController.getRawButton(6);
+        m_rightBumper = mainController.getRawButtonPressed(6);
         m_leftStick = mainController.getRawButton(9);
         m_rightStick = mainController.getRawButton(10);
         m_leftTrigger = mainController.getRawAxis(2);
@@ -45,14 +45,14 @@ public class IO
             Robot.ballMech.runRoller(0);
         }
 
-        // if(m_buttonY)
-        // {
-        //     Robot.ballMech.setShooterMotors(1);
-        // }
-        // else
-        // {
-        //     Robot.ballMech.setShooterMotors(0);
-        // }
+        if(m_buttonY)
+        {
+            Robot.ballMech.setShooterMotors(1);
+        }
+        else
+        {
+            Robot.ballMech.setShooterMotors(0);
+        }
 
         if(m_leftTrigger > 0.5)
         {
@@ -70,6 +70,11 @@ public class IO
         else
         {
             Robot.ballMech.stopIntake();
+        }
+
+        if(m_rightBumper)
+        {
+            Robot.climbMech.extendHanger();
         }
 
         // if(m_buttonX)

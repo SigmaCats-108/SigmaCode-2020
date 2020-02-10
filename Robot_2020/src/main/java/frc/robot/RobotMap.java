@@ -45,6 +45,8 @@ public class RobotMap
 	public static final int DRIVETRAIN_SHIFTER_REV = 1;
 	public static final int INTAKE_EXTENDER_FWD = 2;
 	public static final int INTAKE_EXTENDER_REV = 5;
+	public static final int HANGER_FWD = 4;
+	public static final int HANGER_REV = 3;
 
 	//white - hanger
 	//purple - intake

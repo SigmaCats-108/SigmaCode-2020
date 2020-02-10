@@ -59,7 +59,6 @@ public class BallMech
 	{
 		// shooterMotor1.set(ControlMode.Velocity, speed);
 		shooterMotor1.set(ControlMode.PercentOutput, speed);
-		shooterMotor2.set(ControlMode.PercentOutput, -speed);
 	}
 
 	public void stopShooter()
