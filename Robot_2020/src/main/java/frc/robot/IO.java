@@ -36,14 +36,14 @@ public class IO
 
     public static void ProcessControllers()
     {
-        // if(m_buttonA)
-        // {
-        //     Robot.ballMech.runRoller(-1);
-        // }
-        // else
-        // {
-        //     Robot.ballMech.runRoller(0);
-        // }
+        if(m_buttonA)
+        {
+            Robot.ballMech.runRoller(-1);
+        }
+        else
+        {
+            Robot.ballMech.runRoller(0);
+        }
 
         // if(m_buttonY)
         // {
