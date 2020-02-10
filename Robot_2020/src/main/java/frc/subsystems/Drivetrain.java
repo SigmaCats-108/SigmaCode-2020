@@ -24,7 +24,8 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
-// import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 
 public class Drivetrain extends SubsystemBase
 {
@@ -40,7 +41,7 @@ public class Drivetrain extends SubsystemBase
 	// Odometry class for tracking robot pose
 	private DifferentialDriveOdometry m_odometry;
 	
-	// private static DoubleSolenoid gearShifter = new DoubleSolenoid(RobotMap.PCM1, RobotMap.DRIVETRAIN_SHIFTER_FWD, RobotMap.DRIVETRAIN_SHIFTER_REV);
+	private static DoubleSolenoid gearShifter = new DoubleSolenoid(RobotMap.PCM2, RobotMap.DRIVETRAIN_SHIFTER_FWD, RobotMap.DRIVETRAIN_SHIFTER_REV);
 
 	private double angleError, turnSpeed, targetEncVal = 0;
 	private double turn_Kp = 1/360, desiredAngle;
@@ -79,10 +80,10 @@ public class Drivetrain extends SubsystemBase
 	 */
 	public void highGear(boolean gearState)
 	{
-		// if(gearState)
-		// 	gearShifter.set(Value.kReverse);
-		// else
-		// 	gearShifter.set(Value.kForward);
+		if(gearState)
+			gearShifter.set(Value.kReverse);
+		else
+			gearShifter.set(Value.kForward);
 	}
 
 	/**
