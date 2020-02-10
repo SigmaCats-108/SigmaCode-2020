@@ -71,7 +71,7 @@ public class Robot extends TimedRobot
     public void teleopPeriodic()
     {
         IO.UpdateControllers();
-        // drivetrain.sigmaDrive(IO.m_leftAnalogY, IO.m_rightAnalogY);
+        drivetrain.sigmaDrive(IO.m_leftAnalogY, IO.m_rightAnalogY);
         IO.ProcessControllers();
     }
 
