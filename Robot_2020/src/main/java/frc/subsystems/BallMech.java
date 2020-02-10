@@ -20,7 +20,7 @@ public class BallMech
 	private TalonFX shooterMotor2 = new TalonFX(8);
 	private CANSparkMax intakeMotor = new CANSparkMax(1, MotorType.kBrushless);
 	private CANSparkMax rollerMotor = new CANSparkMax(2, MotorType.kBrushed);
-	// private DoubleSolenoid intakeCylinder = new DoubleSolenoid(2, 3);
+	private DoubleSolenoid intakeCylinder = new DoubleSolenoid(RobotMap.PCM2 ,RobotMap.INTAKE_EXTENDER_FWD , RobotMap.INTAKE_EXTENDER_REV);
 	private Ultrasonic ballSensor_intake = new Ultrasonic(0, 1);
 	private Ultrasonic ballSensor_shooter = new Ultrasonic(2, 3);
 	
@@ -34,7 +34,8 @@ public class BallMech
 		shooterMotor1.config_kI(RobotMap.kPIDLoopIdx, RobotMap.kI, RobotMap.kTimeoutMs);
 		shooterMotor1.config_kD(RobotMap.kPIDLoopIdx, RobotMap.kD, RobotMap.kTimeoutMs);
 		
-		// shooterMotor2.follow(shooterMotor1);
+		shooterMotor2.follow(shooterMotor1);
+		shooterMotor2.setInverted(InvertType.OpposeMaster);
 	}
 
 	public void update()
@@ -45,11 +46,13 @@ public class BallMech
 	public void intake(double speed)
 	{
 		intakeMotor.set(speed);
+		extendIntake(true);
 	}
 
 	public void stopIntake()
 	{
 		intakeMotor.set(0);
+		extendIntake(false);
 	}
 
 	public void setShooterMotors(double speed)
@@ -105,17 +108,13 @@ public class BallMech
 		}
 	}
 
-	// public void extendIntake()
-	// {
-	// 	if(intakeCylinder.get() == Value.kForward)
-	// 	{	
-	// 		intakeCylinder.set(Value.kReverse);
-	// 	}
-	// 	else
-	// 	{
-	// 		intakeCylinder.set(Value.kForward);
-	// 	}
-	// }
+	public void extendIntake(boolean intakeState)
+	{
+		if(intakeState)
+			intakeCylinder.set(Value.kReverse);
+		else
+			intakeCylinder.set(Value.kForward);
+	}
 
 	public int shooterState = 0;
 	public void variableDistanceShooter()
