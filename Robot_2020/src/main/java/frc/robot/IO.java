@@ -36,43 +36,40 @@ public class IO
 
     public static void ProcessControllers()
     {
-
-        // if(m_leftBumper)
+        // if(m_buttonA)
         // {
-        //     Robot.ballMech.variableDistanceShooter();
+        //     Robot.ballMech.runRoller(-1);
         // }
         // else
         // {
-        //     Robot.ballMech.stopShooter();
-        //     Robot.ballMech.shooterState = 0;
+        //     Robot.ballMech.runRoller(0);
         // }
 
-        if(m_buttonA)
+        // if(m_buttonY)
+        // {
+        //     Robot.ballMech.setShooterMotors(1);
+        // }
+        // else
+        // {
+        //     Robot.ballMech.setShooterMotors(0);
+        // }
+
+        if(m_leftTrigger > 0.5)
         {
-            Robot.ballMech.runRoller(-1);
+            Robot.drivetrain.highGear(true);
         }
         else
         {
-            Robot.ballMech.runRoller(0);
-        }        
-        
+            Robot.drivetrain.highGear(false);
+        }
 
-        if(m_buttonX)
+        if(m_leftBumper)
         {
             Robot.ballMech.intake(-0.90);
         }
         else
         {
             Robot.ballMech.stopIntake();
-        }
-
-        if(m_buttonY)
-        {
-            Robot.ballMech.setShooterMotors(1);
-        }
-        else
-        {
-            Robot.ballMech.setShooterMotors(0);
         }
 
         // if(m_buttonX)
