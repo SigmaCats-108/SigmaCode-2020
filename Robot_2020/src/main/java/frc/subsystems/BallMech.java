@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import frc.robot.Robot;
 import frc.robot.RobotMap;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The robot mechanism for the picking up and scoring of balls.
@@ -57,7 +56,6 @@ public class BallMech
 
 	public void setShooterMotors(double speed)
 	{
-		// shooterMotor1.set(ControlMode.Velocity, speed);
 		shooterMotor1.set(ControlMode.PercentOutput, speed);
 	}
 
@@ -95,7 +93,7 @@ public class BallMech
 		return ballCount;
 	}
 
-	public void testicularRetraction()
+	public void moveBalls()
 	{
 		if(ballCount() >= 3 && ballSensor_shooter.getRangeInches() > 30)
 		{
@@ -110,9 +108,13 @@ public class BallMech
 	public void extendIntake(boolean intakeState)
 	{
 		if(intakeState)
+		{
 			intakeCylinder.set(Value.kReverse);
+		}
 		else
+		{
 			intakeCylinder.set(Value.kForward);
+		}
 	}
 
 	public int shooterState = 0;

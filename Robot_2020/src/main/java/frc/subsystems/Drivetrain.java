@@ -81,9 +81,13 @@ public class Drivetrain extends SubsystemBase
 	public void highGear(boolean gearState)
 	{
 		if(gearState)
+		{
 			gearShifter.set(Value.kReverse);
+		}
 		else
+		{
 			gearShifter.set(Value.kForward);
+		}
 	}
 
 	/**

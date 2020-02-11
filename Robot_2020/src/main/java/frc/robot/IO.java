@@ -1,7 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.XboxController;
-import frc.subsystems.SigmaSight;
 
 public class IO
 {
@@ -77,26 +76,14 @@ public class IO
             Robot.climbMech.extendHanger();
         }
 
-        // if(m_buttonX)
-        // {
-        //     Robot.ballMech.intake(1.00);
-        // }
-        // else if(m_buttonA)
-        // {
-        //     Robot.ballMech.intake(0.75);
-        // }
-        // else if(m_buttonB)
-        // {
-        //     Robot.ballMech.intake(0.50);
-        // }
-        // else if(m_buttonY)
-        // {
-        //     Robot.ballMech.intake(0.25);
-        // }
-        // else
-        // {
-        //     Robot.ballMech.stopIntake();
-        // }
-
+        if(m_buttonB)
+        {
+            Robot.climbMech.setClimbMotors(0.2);
+        }
+        else
+        {
+            
+            Robot.climbMech.setClimbMotors(0);
+        }
     }
 }

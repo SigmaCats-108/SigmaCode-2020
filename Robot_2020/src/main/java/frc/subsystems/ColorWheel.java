@@ -23,7 +23,7 @@ public class ColorWheel
 {
 	private CANSparkMax WOFmotor = new CANSparkMax(57, MotorType.kBrushless);
 	private CANEncoder WOFencoder = WOFmotor.getEncoder();
-	// private DoubleSolenoid WOFCylinder = new DoubleSolenoid(0,1);
+	private DoubleSolenoid WOFCylinder = new DoubleSolenoid(0,1);
 
 	private static final I2C.Port i2cPort = I2C.Port.kOnboard;
 	private static final ColorSensorV3 colorSensor = new ColorSensorV3(i2cPort);
@@ -75,17 +75,17 @@ public class ColorWheel
 		}
 	}
 
-	// private void WOFCylinder()
-	// {
-	// 	if(WOFCylinder.get() == Value.kForward)
-	// 	{
-	// 		WOFCylinder.set(Value.kReverse);
-	// 	}
-	// 	else
-	// 	{
-	// 		WOFCylinder.set(Value.kForward);
-	// 	}
-	// }
+	public void WOFCylinder()
+	{
+		if(WOFCylinder.get() == Value.kForward)
+		{
+			WOFCylinder.set(Value.kReverse);
+		}
+		else
+		{
+			WOFCylinder.set(Value.kForward);
+		}
+	}
 
 	public void rotationControl(int position)
 	{
@@ -120,6 +120,7 @@ public class ColorWheel
 				IO.mainController.setRumble(GenericHID.RumbleType.kLeftRumble, 0.5);
 			}
 			break;
+
 			case 'G' :
 			if(match.color != kGreenTarget)
 			{
@@ -132,6 +133,7 @@ public class ColorWheel
 				IO.mainController.setRumble(GenericHID.RumbleType.kLeftRumble, 0.5);
 			}
 			break;
+
 			case 'R' :
 			if(match.color != kRedTarget)
 			{
@@ -144,6 +146,7 @@ public class ColorWheel
 				IO.mainController.setRumble(GenericHID.RumbleType.kLeftRumble, 0.5);
 			}
 			break;
+
 			case 'Y' :
 			if(match.color != kYellowTarget)
 			{

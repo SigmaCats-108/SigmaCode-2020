@@ -18,11 +18,12 @@ public class RobotMap
 	public static final int DRIVETRAIN_LEFT3 = 3;
 
 	// BallMech ID Values
-	public static final int BALLMECH_INTAKE = 9;
+	public static final int BALLMECH_INTAKE = 1;
+	public static final int BALLMECH_ROLLER = 2;
 
 	//climbMech ID Values
-	public static final int CLIMBMECH_MOTOR_LEFT = 2;
-	public static final int CLIMBMECH_MOTOR_RIGHT = 1;
+	public static final int CLIMBMECH_MOTOR1 = 3;
+	public static final int CLIMBMECH_MOTOR2 = 4;
 
 	// Vision System Constants
 	public static final double HATCH_VISION_TURN_PGAIN = -0.008;
@@ -40,18 +41,13 @@ public class RobotMap
 	//Pneumatics
 	public static final int PCM1 = 0;
 	public static final int PCM2 = 1;
-
+	//gray
 	public static final int DRIVETRAIN_SHIFTER_FWD = 6;
 	public static final int DRIVETRAIN_SHIFTER_REV = 1;
+	//purple
 	public static final int INTAKE_EXTENDER_FWD = 2;
 	public static final int INTAKE_EXTENDER_REV = 5;
+	//white
 	public static final int HANGER_FWD = 4;
 	public static final int HANGER_REV = 3;
-
-	//white - hanger
-	//purple - intake
-	//gray - gearbox
-
-	
-
 }
