@@ -20,7 +20,7 @@ public class SigmaSight
     private enum Direction {LEFT, RIGHT, OTHER};
     Direction targetDirection = Direction.LEFT;
 
-    NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
+    NetworkTable limelightTable = NetworkTableInstance.getDefault().getTable("limelight-shooter");
     NetworkTableEntry tv = limelightTable.getEntry("tv");
     NetworkTableEntry tx = limelightTable.getEntry("tx");
     NetworkTableEntry ty = limelightTable.getEntry("ty");
@@ -89,11 +89,16 @@ public class SigmaSight
         Robot.drivetrain.sigmaDrive(steering_adjust, -steering_adjust);
     }
 
+    int counter = 0;
     public boolean lineUpToShoot()
     {
         steering_adjust = turnKp * xVal;
         Robot.drivetrain.sigmaDrive(steering_adjust, -steering_adjust);
-        return Math.abs(xVal) < 1;
+        if(Math.abs(xVal) < 2)
+        {
+            counter++;
+        }
+        return counter > 50;
     }
     
     /**
@@ -136,11 +141,21 @@ public class SigmaSight
 
 	public double desiredSpeed()
 	{
-        return 4698.373 +  0.00435206 * Math.pow(Math.E, 0.4609538 * Math.abs(yVal));
+        return 16316.36 +  1.560498 * Math.pow(Math.E, -2.183764 * Math.abs(yVal));
     }
-    
+    // y = 16316.36 + 1.560498e-10*e^(-2.183764*x)
     public boolean inRange()
     {
         return yVal > 10 && yVal < 30;
+    }
+
+    public void turnOffLights()
+    {
+        NetworkTableInstance.getDefault().getTable("limelight").getEntry("<ledMode>").setNumber(1);
+    }    
+    
+    public void turnOnLights()
+    {
+        NetworkTableInstance.getDefault().getTable("limelight").getEntry("<ledMode>").setNumber(3);
     }
 }

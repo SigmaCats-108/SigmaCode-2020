@@ -7,6 +7,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot;
 import frc.robot.RobotMap;
 
@@ -39,7 +40,7 @@ public class BallMech
 
 	public void update()
 	{
-
+		SmartDashboard.putNumber("velocity", shooterMotor1.getSelectedSensorVelocity());
 	}
 
 	public void intake(double speed)
@@ -54,9 +55,10 @@ public class BallMech
 		extendIntake(false);
 	}
 
-	public void setShooterMotors(double speed)
+	public boolean setShooterMotors(double speed)
 	{
-		shooterMotor1.set(ControlMode.PercentOutput, speed);
+		shooterMotor1.set(ControlMode.Velocity, speed);
+		return Math.abs(shooterMotor1.getSelectedSensorVelocity() - speed) < 500;
 	}
 
 	public void stopShooter()
@@ -130,13 +132,13 @@ public class BallMech
 			break;
 
 			case 1:
-			if(Robot.sigmaSight.inRange())
+			if(setShooterMotors(Robot.sigmaSight.desiredSpeed()))
 			{
-				setShooterMotors(Robot.sigmaSight.desiredSpeed());
+				runRoller(-1);
 			}
 			else
 			{
-				System.out.println("NOT IN RANGE");
+				runRoller(0);
 			}
 			break;
 		}
