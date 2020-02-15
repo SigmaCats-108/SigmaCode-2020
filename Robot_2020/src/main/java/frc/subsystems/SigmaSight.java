@@ -89,7 +89,7 @@ public class SigmaSight
         Robot.drivetrain.sigmaDrive(steering_adjust, -steering_adjust);
     }
 
-    int counter = 0;
+    public int counter = 0;
     public boolean lineUpToShoot()
     {
         steering_adjust = turnKp * xVal;
@@ -141,7 +141,7 @@ public class SigmaSight
 
 	public double desiredSpeed()
 	{
-        return 16316.36 +  1.560498 * Math.pow(Math.E, -2.183764 * Math.abs(yVal));
+        return 16316.36 +  1.560488 * Math.pow(Math.E, -2.183764 * Math.abs(yVal));
     }
     // y = 16316.36 + 1.560498e-10*e^(-2.183764*x)
     public boolean inRange()

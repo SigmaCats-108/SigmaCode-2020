@@ -13,7 +13,6 @@ public class IO
     public static double m_leftTrigger, m_rightTrigger, m_leftAnalogX, m_rightAnalogX, m_leftAnalogY, m_rightAnalogY;
     public static boolean o_buttonA, o_buttonB, o_buttonX, o_buttonXReleased, o_buttonY, o_leftBumper, o_rightBumper, o_leftStick, o_rightStick;
     public static double o_leftTrigger, o_rightTrigger, o_leftAnalogX, o_rightAnalogX, o_leftAnalogY, o_rightAnalogY;
-    static double  rpm = 15000;
 
     public static void UpdateControllers()
     {
@@ -37,15 +36,6 @@ public class IO
 
     public static void ProcessControllers()
     {
-        // if(m_buttonB)
-        // {
-        //     Robot.ballMech.runRoller(-1);
-        // }
-        // else
-        // {
-        //     Robot.ballMech.runRoller(0);
-        // }
-
         if(m_rightTrigger > 0.5)
         {
             Robot.ballMech.variableDistanceShooter();;
@@ -53,6 +43,9 @@ public class IO
         else
         {
             Robot.ballMech.setShooterMotors(0);
+            Robot.ballMech.runRoller(0);
+            Robot.sigmaSight.counter = 0;
+            Robot.ballMech.counter = 0;
             Robot.ballMech.shooterState = 0;
         }
 
@@ -67,37 +60,23 @@ public class IO
 
         if(m_leftBumper)
         {
+            Robot.ballMech.runRollerWithIntake();
             Robot.ballMech.intake(-0.90);
         }
         else
         {
             Robot.ballMech.stopIntake();
+            Robot.ballMech.rollerState = 0;
         }
 
-        // if(m_rightBumper)
+        // if(m_buttonX)
         // {
-        //     Robot.sigmaSight.turnToTarget();
+        //     Robot.ballMech.rollerMotor.set(.6);
+        // }
+        // else if(!m_leftBumper)
+        // {
+        //     Robot.ballMech.rollerMotor.set(0);
         // }
 
-        // if(m_buttonB)
-        // {
-        //     Robot.climbMech.setClimbMotors(0.5);
-        // }
-        // else
-        // {
-            
-        //     Robot.climbMech.setClimbMotors(0);
-        // }
-
-        // if(m_buttonY)
-        // {
-        //     rpm += 200;
-        // }
-        // if(m_buttonA)
-        // {
-        //     rpm -= 200;
-        // }
- 
-        SmartDashboard.putNumber("rpm", rpm);
     }
 }

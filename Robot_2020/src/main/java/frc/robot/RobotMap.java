@@ -26,7 +26,7 @@ public class RobotMap
 	public static final int CLIMBMECH_MOTOR2 = 4;
 
 	// Vision System Constants
-	public static final double HATCH_VISION_TURN_PGAIN = -0.02;
+	public static final double HATCH_VISION_TURN_PGAIN = -0.025;
 	public static final double HATCH_VISION_DISTANCE_PGAIN = 0.3;
 	public static final double HATCH_VISION_MIN_AIM_COMMAND = 0.0;
 	public static final double HATCH_VISION_DESIRED_TARGET_AREA = 4.0;	
