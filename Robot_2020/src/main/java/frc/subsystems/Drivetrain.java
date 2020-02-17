@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import java.util.List;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
+import frc.SensorInputs.NavX;
 import frc.robot.Robot;
 
 import com.revrobotics.CANSparkMax;
@@ -42,7 +43,7 @@ public class Drivetrain extends SubsystemBase
 	private static CANSparkMax rightSparkMax2 = new CANSparkMax(RobotMap.DRIVETRAIN_RIGHT2, MotorType.kBrushless);
 	private static CANSparkMax rightSparkMax3 = new CANSparkMax(RobotMap.DRIVETRAIN_RIGHT3, MotorType.kBrushless);
 
-	// private static TalonFX talonFX1 = new TalonFX(1);
+	private static TalonFX talonFX1 = new TalonFX(1);
 	// private static TalonFX talonFX2 = new TalonFX(2);
 	// private static TalonFX talonFX3 = new TalonFX(3);
 
@@ -88,7 +89,7 @@ public class Drivetrain extends SubsystemBase
 		// Sets drivetrain deadband, default is 0.02
 		drive.setDeadband(0.03);
 
-		// talonFX1.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+		talonFX1.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
 	}
 
 	/**
@@ -149,6 +150,18 @@ public class Drivetrain extends SubsystemBase
 		}
 
 		return false;
+	}
+
+	double turnKP = 0.1;
+	double distanceKP = 0.1;
+	public void driveToAngle(double distance_inches, double endPose)
+	{
+		double desiredPosition = talonFX1.getSelectedSensorPosition() + (distance_inches * ENC_TICKS_PER_INCH);
+		double distance_adjust = (desiredPosition - talonFX1.getSelectedSensorPosition()) * distanceKP;
+		double angle_adjust = (endPose - Robot.navX.angle) * turnKP;
+		double left_command = angle_adjust + distance_adjust;
+		double right_command = -angle_adjust + distance_adjust;
+		sigmaDrive(left_command, right_command);
 	}
 
 	public void update()
