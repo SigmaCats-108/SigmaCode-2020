@@ -13,6 +13,7 @@ public class IO
     public static double m_leftTrigger, m_rightTrigger, m_leftAnalogX, m_rightAnalogX, m_leftAnalogY, m_rightAnalogY;
     public static boolean o_buttonA, o_buttonB, o_buttonX, o_buttonXReleased, o_buttonY, o_leftBumper, o_rightBumper, o_leftStick, o_rightStick;
     public static double o_leftTrigger, o_rightTrigger, o_leftAnalogX, o_rightAnalogX, o_leftAnalogY, o_rightAnalogY;
+    static double  rpm = 15000;
 
     public static void UpdateControllers()
     {
@@ -36,17 +37,26 @@ public class IO
 
     public static void ProcessControllers()
     {
+        // if(m_rightTrigger > 0.5)
+        // {
+        //     Robot.ballMech.variableDistanceShooter();;
+        // }
+        // else
+        // {
+        //     Robot.ballMech.setShooterMotors(0);
+        //     Robot.ballMech.runRoller(0);
+        //     Robot.sigmaSight.counter = 0;
+        //     Robot.ballMech.counter = 0;
+        //     Robot.ballMech.shooterState = 0;
+        // }
+
         if(m_rightTrigger > 0.5)
         {
-            Robot.ballMech.variableDistanceShooter();;
+            Robot.ballMech.setShooterMotors(rpm);
         }
         else
         {
-            Robot.ballMech.setShooterMotors(0);
-            Robot.ballMech.runRoller(0);
-            Robot.sigmaSight.counter = 0;
-            Robot.ballMech.counter = 0;
-            Robot.ballMech.shooterState = 0;
+            Robot.ballMech.stopShooter();
         }
 
         if(m_leftTrigger > 0.5)
@@ -67,6 +77,26 @@ public class IO
         {
             Robot.ballMech.stopIntake();
             Robot.ballMech.rollerState = 0;
+        }
+
+        if(m_buttonY)
+        {
+            rpm += 200;
+        }
+        if(m_buttonA)
+        {
+            rpm -= 200;
+        }
+
+        SmartDashboard.putNumber("rpm", rpm);
+
+        if(m_buttonB)
+        {
+            Robot.ballMech.runRoller(-1);
+        }
+        else
+        {
+            Robot.ballMech.runRoller(0);
         }
 
         // if(m_buttonX)

@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import frc.robot.Robot;
 import frc.robot.RobotMap;
 
@@ -45,12 +46,15 @@ public class BallMech
 		SmartDashboard.putNumber("ballsensor intake", ballSensor_intake.getRangeInches());
 	}
 
+	public int intakeCounter = 0;
 	public void intake(double speed)
 	{
+		intakeCounter++;
 		extendIntake(true);
-		// try {Thread.sleep(300);}
-		// catch (InterruptedException e) {}
-		intakeMotor.set(speed);
+		if(intakeCounter > 40)
+		{
+			intakeMotor.set(speed);
+		}
 	}
 
 	public int rollerState = 0;
@@ -76,6 +80,7 @@ public class BallMech
 	{
 		intakeMotor.set(0);
 		extendIntake(false);
+		intakeCounter = 0;
 	}
 	public int counter = 0;
 	public boolean setShooterMotors(double speed)
@@ -87,6 +92,11 @@ public class BallMech
 			System.out.println("counter " + counter);
 		}
 		return counter > 20;
+	}
+
+	public void testShooterMotors(double speed)
+	{
+		shooterMotor1.set(ControlMode.Velocity, speed);
 	}
 
 	public void stopShooter()
