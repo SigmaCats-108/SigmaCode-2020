@@ -52,7 +52,7 @@ public class IO
 
         if(m_rightTrigger > 0.5)
         {
-            Robot.ballMech.setShooterMotors(rpm);
+            Robot.ballMech.setShooterMotors(Robot.sigmaSight.desiredSpeed());
         }
         else
         {
@@ -81,11 +81,7 @@ public class IO
 
         if(m_buttonY)
         {
-            rpm += 200;
-        }
-        if(m_buttonA)
-        {
-            rpm -= 200;
+            // Robot.drivetrain.driveToAngle(distance_inches, endPose);
         }
 
         SmartDashboard.putNumber("rpm", rpm);

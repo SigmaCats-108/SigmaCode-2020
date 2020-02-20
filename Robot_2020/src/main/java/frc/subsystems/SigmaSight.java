@@ -142,13 +142,15 @@ public class SigmaSight
 	public double desiredSpeed()
 	{
       //  return 63181.81 -  45476.19 * Math.pow(Math.E, -0.00244242 * Math.abs(yVal));
-
-      return 17768.27 + 321.3398 * yVal - Math.pow(4.327441 * yVal, 2)  - Math.pow(2.216103 * yVal, 3);
+        SmartDashboard.putNumber("desired speed", 17693.11 + 791.3032 * yVal + 125.3293 * Math.pow(yVal, 2)  + 5.391753 * Math.pow(yVal, 3));
+        return 17693.11 + 791.3032 * yVal + 125.3293 * Math.pow(yVal, 2)  + 5.391753 * Math.pow(yVal, 3);
     }
     // y = 16316.36 + 1.560498e-10*e^(-2.183764*x) equation 1
     // y = 63181.81 - 45476.19*e^(-0.00244242*x) equation 2
     //y = 17866.53 + 339.3089*x - 16.45606*x^2 - 3.645881*x^3
     //y = 17768.27 + 321.3398*x - 4.327441*x^2 - 2.216103*x^3
+    //y = 17693.11 + 791.3032*x + 125.3293*x^2 + 5.391753*x^3
+    //y = 17693.11 + 791.3032*x + 125.3293*x^2 + 5.391753*x^3
     public boolean inRange()
     {
         return yVal > 10 && yVal < 30;

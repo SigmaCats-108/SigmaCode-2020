@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
@@ -21,6 +22,7 @@ import frc.robot.RobotMap;
 
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.sensors.SensorInitializationStrategy;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -44,7 +46,6 @@ public class Drivetrain extends SubsystemBase
 	private static DoubleSolenoid gearShifter = new DoubleSolenoid(RobotMap.PCM2, RobotMap.DRIVETRAIN_SHIFTER_FWD, RobotMap.DRIVETRAIN_SHIFTER_REV);
 
 	private double angleError, turnSpeed, targetEncVal = 0;
-	private double turn_Kp = 1/360, desiredAngle;
 	public int moveState = 0;
 	public int turnState = 0;
 	private final double ENC_TICKS_PER_INCH = 58.4 / 60;
@@ -59,6 +60,9 @@ public class Drivetrain extends SubsystemBase
 		rightTalon1.setInverted(true);
 		rightTalon2.setInverted(InvertType.FollowMaster);
 		rightTalon3.setInverted(InvertType.FollowMaster);
+
+		rightTalon1.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+		leftTalon1.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
 	}
 
 	/**
@@ -90,128 +94,22 @@ public class Drivetrain extends SubsystemBase
 		}
 	}
 
-	/**
-	 * Drives the robot a set distance in a straight line
-	 * Does not use the gyro to account for angle
-	 * 
-	 * @param inches
-	 * @param speed
-	 */
-	public boolean driveStraight(int inches)
+	double turnKP = 0.1;
+	double distanceKP = 0.1;
+	public void driveToAngle(double distance_inches, double endPose)
 	{
-
-		switch(moveState)
-		{
-			case 0:
-			targetEncVal = rightTalon1.getSelectedSensorPosition() + (inches * ENC_TICKS_PER_INCH);
-			moveState = 1;
-			break;
-			
-			case 1:
-			sigmaDrive(-0.35, -0.35);
-			if(rightTalon1.getSelectedSensorPosition() > targetEncVal - 5)
-			{
-				moveState = 2;
-			}
-			break;
-
-			case 2:
-			sigmaDrive(0.0, 0.0);
-			moveState = 0;
-			return true;
-		}
-
-		return false;
+		double averageEncoderPosition = (leftTalon1.getSelectedSensorPosition() + rightTalon1.getSelectedSensorPosition()) / 2;
+		double desiredPosition = averageEncoderPosition + (distance_inches * ENC_TICKS_PER_INCH);
+		double distance_adjust = (desiredPosition - averageEncoderPosition) * distanceKP;
+		double angle_adjust = (endPose - Robot.navX.angle) * turnKP;
+		double left_command = angle_adjust + distance_adjust;
+		double right_command = -angle_adjust + distance_adjust;
+		sigmaDrive(left_command, right_command);
 	}
 
 	public void update()
 	{
-
-	}
-
-	// public void talonTest(double speed)
-	// {
-	// 	talonFX1.set(ControlMode.PercentOutput, speed);
-	// }
-
-	/**
-	 * Turns the robot to a desired angle
-	 * 
-	 * @param robotHeading The robot's current heading
-	 * @param desiredAngle Angle that the robot will rotate towards
-	 * @param rotationRate Rate at which the robot will turn
-	 * @param tolerance Angle deadzone to prevent overshooting
-	 * @return Lets the code know when the robot is within the target range
-	 */
-	public boolean toAngle(double desiredAngle, double rotationRate, double tolerance)
-	{
-		double output;
-		double currentAngle = -Robot.navX.yaw;
-		double angleDifference = desiredAngle - currentAngle;
-		boolean turnFinished;
-
-		if(angleDifference > tolerance)
-		{
-			turnFinished = false;
-			
-			if(angleDifference > 10 || angleDifference < -10)
-			{
-				output = 0.7*rotationRate;
-			}
-			else
-			{
-				output = 0.5*rotationRate;
-			}
-
-			if(angleDifference > 0)
-			{
-				sigmaDrive(-output, output);
-			}
-			else
-			{
-				sigmaDrive(output, -output);
-			}
-		}
-		else
-		{
-			turnFinished = true;
-		}
-
-		return turnFinished;
-	}
-
-	/**
-	 * *Broken for the time being*
-	 * 
-	 * @param angle
-	 * @return
-	 */
-	public boolean turnAngle(double angle)
-	{
-		switch(turnState)
-		{
-			case 0:
-			
-			System.out.println("Running this state: " + turnState);
-
-			desiredAngle =  Robot.navX.angle + angle;
-			System.out.println("Current angle: " + angle + "     Desired Angle: " + desiredAngle);
-			turnState++;
-			
-			case 1:
-			angleError = desiredAngle - Robot.navX.angle;
-			turnSpeed = angleError * turn_Kp;
-			sigmaDrive(turnSpeed, -turnSpeed);
-			if(Math.abs(angleError) < 5)
-			{
-				turnState++;		
-				sigmaDrive(0.0, 0.0);
-				return true;
-			}
-			break;
-		}
-
-		return false;
+		SmartDashboard.putNumber("encoder", (leftTalon1.getSelectedSensorPosition() + rightTalon1.getSelectedSensorPosition()) / 2);
 	}
 
 	public double getLeftEncoderVel()
