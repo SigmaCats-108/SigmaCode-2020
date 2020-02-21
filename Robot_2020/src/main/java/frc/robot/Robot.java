@@ -19,7 +19,6 @@ public class Robot extends TimedRobot
     public static ColorWheel wheelOfFortune;
     public static BallMech ballMech;
     public static ClimbMech climbMech;
-    private Command m_autonomousCommand;
 
     @Override
     public void robotInit() 
@@ -47,12 +46,7 @@ public class Robot extends TimedRobot
     @Override
     public void autonomousInit() 
     {
-        m_autonomousCommand = drivetrain.getAutonomousCommand();
-
-        if (m_autonomousCommand != null)
-        {
-            m_autonomousCommand.schedule();
-        }
+  
     }
 
     @Override
@@ -64,10 +58,6 @@ public class Robot extends TimedRobot
     @Override
     public void teleopInit()
     {
-        if (m_autonomousCommand != null)
-        {
-            m_autonomousCommand.cancel();
-        }
     }
 
     @Override

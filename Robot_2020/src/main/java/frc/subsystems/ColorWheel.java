@@ -112,7 +112,6 @@ public class ColorWheel
 			{
 				WOFmotor.set(1.0);
 				System.out.println("Blue");
-
 			}
 			else
 			{
