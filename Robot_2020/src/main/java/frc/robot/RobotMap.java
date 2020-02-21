@@ -50,4 +50,7 @@ public class RobotMap
 	//white
 	public static final int HANGER_FWD = 4;
 	public static final int HANGER_REV = 3;
+	//color wheel
+	public static final int WOF_FWD = 5;
+	public static final int WOF_REV = 2;
 }

@@ -2,6 +2,7 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 public class IO
 {
@@ -14,10 +15,11 @@ public class IO
     public static boolean o_buttonA, o_buttonB, o_buttonX, o_buttonXReleased, o_buttonY, o_leftBumper, o_rightBumper, o_leftStick, o_rightStick;
     public static double o_leftTrigger, o_rightTrigger, o_leftAnalogX, o_rightAnalogX, o_leftAnalogY, o_rightAnalogY;
     static double  rpm = 15000;
+    public static boolean WOF_Running = false;
 
     public static void UpdateControllers()
     {
-        m_buttonA = mainController.getRawButtonPressed(1);
+        m_buttonA = mainController.getRawButton(1);
         m_buttonB = mainController.getRawButton(2);
         m_buttonX = mainController.getRawButton(3);
         m_buttonXRaw = mainController.getRawButton(3);
@@ -37,27 +39,27 @@ public class IO
 
     public static void ProcessControllers()
     {
-        // if(m_rightTrigger > 0.5)
-        // {
-        //     Robot.ballMech.variableDistanceShooter();;
-        // }
-        // else
-        // {
-        //     Robot.ballMech.setShooterMotors(0);
-        //     Robot.ballMech.runRoller(0);
-        //     Robot.sigmaSight.counter = 0;
-        //     Robot.ballMech.counter = 0;
-        //     Robot.ballMech.shooterState = 0;
-        // }
-
         if(m_rightTrigger > 0.5)
         {
-            Robot.ballMech.setShooterMotors(Robot.sigmaSight.desiredSpeed());
+            Robot.ballMech.variableDistanceShooter();;
         }
         else
         {
-            Robot.ballMech.stopShooter();
+            Robot.ballMech.setShooterMotors(0);
+            Robot.ballMech.runRoller(0);
+            Robot.sigmaSight.counter = 0;
+            Robot.ballMech.counter = 0;
+            Robot.ballMech.shooterState = 0;
         }
+
+        // if(m_rightTrigger > 0.5)
+        // {
+        //     Robot.ballMech.setShooterMotors(Robot.sigmaSight.desiredSpeed());
+        // }
+        // else
+        // {
+        //     Robot.ballMech.stopShooter();
+        // }
 
         if(m_leftTrigger > 0.5)
         {
@@ -81,19 +83,36 @@ public class IO
 
         if(m_buttonY)
         {
-            // Robot.drivetrain.driveToAngle(distance_inches, endPose);
+            Robot.wheelOfFortune.WOFCylinder();
         }
 
-        SmartDashboard.putNumber("rpm", rpm);
-
-        if(m_buttonB)
+        if(m_buttonA)
         {
-            Robot.ballMech.runRoller(-1);
+            WOF_Running = true;
+        }
+
+        if(WOF_Running)
+        {
+            Robot.wheelOfFortune.runWOF();
         }
         else
         {
-            Robot.ballMech.runRoller(0);
+            IO.mainController.setRumble(RumbleType.kLeftRumble, 0);
+            Robot.wheelOfFortune.WOFmotor.set(0);
+            Robot.wheelOfFortune.WOFencoder.setPosition(0);
         }
+        Robot.wheelOfFortune.ruvib();
+        System.out.println("WOF enc: " + Robot.wheelOfFortune.WOFencoder.getPosition());
+
+
+        // if(m_buttonB)
+        // {
+        //     Robot.ballMech.runRoller(-1);
+        // }
+        // else
+        // {
+        //     Robot.ballMech.runRoller(0);
+        // }
 
         // if(m_buttonX)
         // {

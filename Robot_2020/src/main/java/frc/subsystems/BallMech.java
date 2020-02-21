@@ -1,6 +1,7 @@
 package frc.subsystems;
 
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -38,6 +39,7 @@ public class BallMech
 		shooterMotor2.follow(shooterMotor1);
 		shooterMotor2.setInverted(InvertType.OpposeMaster);
 		ballSensor_intake.setAutomaticMode(true);
+		intakeMotor.setIdleMode(IdleMode.kBrake);
 	}
 
 	public void update()

@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
 import com.revrobotics.ColorSensorV3;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorMatch;
@@ -14,6 +15,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.IO;
+import frc.robot.RobotMap;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANEncoder;
@@ -21,9 +23,9 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class ColorWheel
 {
-	private CANSparkMax WOFmotor = new CANSparkMax(57, MotorType.kBrushless);
-	private CANEncoder WOFencoder = WOFmotor.getEncoder();
-	private DoubleSolenoid WOFCylinder = new DoubleSolenoid(0,1);
+	public CANSparkMax WOFmotor = new CANSparkMax(5, MotorType.kBrushless);
+	public CANEncoder WOFencoder = WOFmotor.getEncoder();
+	private DoubleSolenoid WOFCylinder = new DoubleSolenoid(RobotMap.PCM1, RobotMap.WOF_FWD, RobotMap.WOF_REV);
 
 	private static final I2C.Port i2cPort = I2C.Port.kOnboard;
 	private static final ColorSensorV3 colorSensor = new ColorSensorV3(i2cPort);
@@ -32,6 +34,7 @@ public class ColorWheel
     private final Color kGreenTarget = ColorMatch.makeColor(0.166, 0.577, 0.257);
     private final Color kRedTarget = ColorMatch.makeColor(0.520, 0.346, 0.133);
     private final Color kYellowTarget = ColorMatch.makeColor(0.318, 0.357, 0.125);
+    private final Color kNothing = ColorMatch.makeColor(0.291, 0.468, 0.239);
 	
 	public ColorWheel()
 	{
@@ -39,6 +42,10 @@ public class ColorWheel
 		m_colorMatcher.addColorMatch(kGreenTarget);
 		m_colorMatcher.addColorMatch(kRedTarget);
 		m_colorMatcher.addColorMatch(kYellowTarget); 
+		m_colorMatcher.addColorMatch(kNothing); 
+
+		WOFmotor.setIdleMode(IdleMode.kBrake);
+		WOFCylinder.set(Value.kForward);
 	}
 
 	public void updateColors()
@@ -91,12 +98,13 @@ public class ColorWheel
 	{
 		if(WOFencoder.getPosition() < position)
 		{
-			WOFmotor.set(1);
+			WOFmotor.set(0.3);
 		}
 		else
 		{
 			WOFmotor.set(0);
 			IO.mainController.setRumble(RumbleType.kLeftRumble, 1.0);
+			IO.WOF_Running = false;
 		}
 	}
 
@@ -110,54 +118,70 @@ public class ColorWheel
 			case 'B' :
 			if(match.color != kBlueTarget)
 			{
-				WOFmotor.set(1.0);
+				WOFmotor.set(0.4);
 				System.out.println("Blue");
 			}
 			else
 			{
 				WOFmotor.set(0);
-				IO.mainController.setRumble(GenericHID.RumbleType.kLeftRumble, 0.5);
+				IO.mainController.setRumble(GenericHID.RumbleType.kLeftRumble, 1);
+				IO.WOF_Running = false;
 			}
 			break;
 
 			case 'G' :
 			if(match.color != kGreenTarget)
 			{
-				WOFmotor.set(1.0);
+				WOFmotor.set(0.4);
 				System.out.println("Green");
 			}
 			else
 			{
 				WOFmotor.set(0);
-				IO.mainController.setRumble(GenericHID.RumbleType.kLeftRumble, 0.5);
+				IO.mainController.setRumble(GenericHID.RumbleType.kLeftRumble, 1);
+				IO.WOF_Running = false;
 			}
 			break;
 
 			case 'R' :
 			if(match.color != kRedTarget)
 			{
-				WOFmotor.set(1.0);
+				WOFmotor.set(0.4);
 				System.out.println("Red");
 			}
 			else
 			{
 				WOFmotor.set(0);
-				IO.mainController.setRumble(GenericHID.RumbleType.kLeftRumble, 0.5);
+				IO.mainController.setRumble(GenericHID.RumbleType.kLeftRumble, 1);
+				IO.WOF_Running = false;
 			}
 			break;
 
 			case 'Y' :
 			if(match.color != kYellowTarget)
 			{
-				WOFmotor.set(1.0);
+				WOFmotor.set(0.4);
 				System.out.println("Yellow");
 			}
 			else
 			{
 				WOFmotor.set(0);
-				IO.mainController.setRumble(GenericHID.RumbleType.kLeftRumble, 0.5);
+				IO.mainController.setRumble(GenericHID.RumbleType.kLeftRumble, 1);
+				IO.WOF_Running = false;
 			}
 			break;	
+		}
+	}
+
+	public void runWOF()
+	{
+		if(DriverStation.getInstance().getGameSpecificMessage().length() == 0)
+		{
+			rotationControl(400);
+		}
+		else
+		{
+			positionControl();
 		}
 	}
 }
