@@ -116,7 +116,7 @@ public class ColorWheel
 		switch(gameData.charAt(0))
 		{
 			case 'B' :
-			if(match.color != kBlueTarget)
+			if(match.color != kRedTarget)
 			{
 				WOFmotor.set(0.4);
 				System.out.println("Blue");
@@ -130,7 +130,7 @@ public class ColorWheel
 			break;
 
 			case 'G' :
-			if(match.color != kGreenTarget)
+			if(match.color != kYellowTarget)
 			{
 				WOFmotor.set(0.4);
 				System.out.println("Green");
@@ -144,7 +144,7 @@ public class ColorWheel
 			break;
 
 			case 'R' :
-			if(match.color != kRedTarget)
+			if(match.color != kBlueTarget)
 			{
 				WOFmotor.set(0.4);
 				System.out.println("Red");
@@ -158,7 +158,7 @@ public class ColorWheel
 			break;
 
 			case 'Y' :
-			if(match.color != kYellowTarget)
+			if(match.color != kGreenTarget)
 			{
 				WOFmotor.set(0.4);
 				System.out.println("Yellow");

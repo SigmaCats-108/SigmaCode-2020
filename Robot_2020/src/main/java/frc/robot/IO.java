@@ -10,12 +10,13 @@ public class IO
     public static XboxController operatorController = new XboxController(1);
 
     // Main Controller Variables
-    public static boolean m_buttonA, m_buttonB, m_buttonX, m_buttonXRaw, m_buttonY, m_leftBumper, m_leftBumperReleased, m_rightBumper, m_leftStick, m_rightStick, o_buttonBReleased;
+    public static boolean m_buttonA, m_buttonB, m_buttonX, m_buttonXRaw, m_buttonY, m_leftBumper, m_leftBumperReleased, m_rightBumper, m_leftStick, m_rightStick, o_buttonBReleased, m_pauseButton;
     public static double m_leftTrigger, m_rightTrigger, m_leftAnalogX, m_rightAnalogX, m_leftAnalogY, m_rightAnalogY;
     public static boolean o_buttonA, o_buttonB, o_buttonX, o_buttonXReleased, o_buttonY, o_leftBumper, o_rightBumper, o_leftStick, o_rightStick;
     public static double o_leftTrigger, o_rightTrigger, o_leftAnalogX, o_rightAnalogX, o_leftAnalogY, o_rightAnalogY;
     static double  rpm = 15000;
     public static boolean WOF_Running = false;
+    public static int m_DPad;
 
     public static void UpdateControllers()
     {
@@ -26,7 +27,7 @@ public class IO
         m_buttonY = mainController.getRawButtonPressed(4);
         m_leftBumper = mainController.getRawButton(5);
         m_leftBumperReleased = mainController.getRawButtonReleased(5);
-        m_rightBumper = mainController.getRawButton(6);
+        m_rightBumper = mainController.getRawButtonPressed(6);
         m_leftStick = mainController.getRawButton(9);
         m_rightStick = mainController.getRawButton(10);
         m_leftTrigger = mainController.getRawAxis(2);
@@ -35,6 +36,9 @@ public class IO
         m_rightAnalogX = mainController.getRawAxis(4);
         m_leftAnalogY = mainController.getRawAxis(1);
         m_rightAnalogY = mainController.getRawAxis(5);
+        m_DPad = mainController.getPOV();
+        m_pauseButton = mainController.getRawButtonPressed(8);
+        SmartDashboard.putNumber("D pad", m_DPad);
     }
 
     public static void ProcessControllers()
@@ -45,7 +49,7 @@ public class IO
         }
         else
         {
-            Robot.ballMech.setShooterMotors(0);
+            Robot.ballMech.stopShooter();
             Robot.ballMech.runRoller(0);
             Robot.sigmaSight.counter = 0;
             Robot.ballMech.counter = 0;
@@ -104,6 +108,23 @@ public class IO
         Robot.wheelOfFortune.ruvib();
         System.out.println("WOF enc: " + Robot.wheelOfFortune.WOFencoder.getPosition());
 
+        if(m_pauseButton)
+        {
+            Robot.climbMech.extendHanger();
+        }
+
+        if(m_DPad == 0)
+        {
+            Robot.climbMech.climb();
+        }
+        else if(m_DPad == 180)
+        {
+            Robot.climbMech.setClimbMotors(-.3);
+        }
+        else
+        {
+            Robot.climbMech.setClimbMotors(0);
+        }
 
         // if(m_buttonB)
         // {

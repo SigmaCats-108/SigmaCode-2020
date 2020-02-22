@@ -39,7 +39,7 @@ public class BallMech
 		shooterMotor2.follow(shooterMotor1);
 		shooterMotor2.setInverted(InvertType.OpposeMaster);
 		ballSensor_intake.setAutomaticMode(true);
-		intakeMotor.setIdleMode(IdleMode.kBrake);
+		intakeMotor.setIdleMode(IdleMode.kCoast);
 	}
 
 	public void update()

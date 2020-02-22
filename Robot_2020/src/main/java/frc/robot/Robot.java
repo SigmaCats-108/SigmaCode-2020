@@ -38,6 +38,7 @@ public class Robot extends TimedRobot
         navX.updateAHRS();
         ballMech.update();
         wheelOfFortune.updateColors();
+        climbMech.update();
     }
     
     @Override
