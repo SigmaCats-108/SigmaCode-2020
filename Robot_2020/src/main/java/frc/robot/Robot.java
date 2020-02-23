@@ -1,5 +1,9 @@
 package frc.robot;
 
+import com.ctre.phoenix.ErrorCode;
+import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
+import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 
 import frc.subsystems.SigmaSight;
@@ -17,10 +21,12 @@ public class Robot extends TimedRobot
     public static ColorWheel wheelOfFortune;
     public static BallMech ballMech;
     public static ClimbMech climbMech;
+    public static StatorCurrentLimitConfiguration currentLimit;
 
     @Override
     public void robotInit() 
     {
+        currentLimit = new StatorCurrentLimitConfiguration(true, 38, 30, 0.5);
         sigmaSight = new SigmaSight();
         drivetrain = new Drivetrain();
         navX = new NavX();
@@ -39,6 +45,10 @@ public class Robot extends TimedRobot
         ballMech.update();
         wheelOfFortune.updateColors();
         climbMech.update();
+        // TalonFXConfiguration eafd = new TalonFXConfiguration();
+        // Robot.drivetrain.rightTalon1.getAllConfigs(eafd);
+        // System.out.println(eafd.toString());
+        // Robot.drivetrain.rightTalon1.configGetParameter(ParamEnum., ordinal, timeoutMs)
     }
     
     @Override
@@ -46,16 +56,21 @@ public class Robot extends TimedRobot
     {
   
     }
-
+    
     @Override
     public void autonomousPeriodic()
     {
+        Robot.drivetrain.autoDrive();
         
     }
 
     @Override
     public void teleopInit()
     {
+        Robot.drivetrain.rightTalon1.configGetStatorCurrentLimit(currentLimit,1000);
+		Robot.drivetrain.rightTalon2.configGetStatorCurrentLimit(currentLimit,1000);
+		Robot.drivetrain.leftTalon1.configGetStatorCurrentLimit(currentLimit,1000);
+		Robot.drivetrain.leftTalon3.configGetStatorCurrentLimit(currentLimit,1000);
     }
 
     @Override

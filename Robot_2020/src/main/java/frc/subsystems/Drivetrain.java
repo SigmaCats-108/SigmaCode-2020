@@ -15,32 +15,41 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 public class Drivetrain
 {
 	// Motor Controller Declarations
-	private TalonFX rightTalon1  = new TalonFX(RobotMap.DRIVETRAIN_RIGHT1);
-	private TalonFX rightTalon2  = new TalonFX(RobotMap.DRIVETRAIN_RIGHT2);
-	private TalonFX rightTalon3  = new TalonFX(RobotMap.DRIVETRAIN_RIGHT3);
-	private TalonFX leftTalon1  = new TalonFX(RobotMap.DRIVETRAIN_LEFT1);
-	private TalonFX leftTalon2  = new TalonFX(RobotMap.DRIVETRAIN_LEFT2);
-	private TalonFX leftTalon3  = new TalonFX(RobotMap.DRIVETRAIN_LEFT3);
+	public TalonFX rightTalon1  = new TalonFX(RobotMap.DRIVETRAIN_RIGHT1);
+	public TalonFX rightTalon2  = new TalonFX(RobotMap.DRIVETRAIN_RIGHT2);
+	//publicate TalonFX rightTalon3  = new TalonFX(RobotMap.DRIVETRAIN_RIGHT3); //bottom motor
+	public TalonFX leftTalon1  = new TalonFX(RobotMap.DRIVETRAIN_LEFT1);
+	//publicate TalonFX leftTalon2  = new TalonFX(RobotMap.DRIVETRAIN_LEFT2); //bottom motor
+	public TalonFX leftTalon3  = new TalonFX(RobotMap.DRIVETRAIN_LEFT3);
 		
 	private static DoubleSolenoid gearShifter = new DoubleSolenoid(RobotMap.PCM2, RobotMap.DRIVETRAIN_SHIFTER_FWD, RobotMap.DRIVETRAIN_SHIFTER_REV);
-
+	
 	public int moveState = 0;
 	public int turnState = 0;
-	private final double ENC_TICKS_PER_INCH = 58.4 / 60;
+	private final double ENC_TICKS_PER_INCH = 131113.5 / 120; //measured value of encoder ticks per inch
 
 	public Drivetrain()
 	{
 		rightTalon2.follow(rightTalon1);
-		rightTalon3.follow(rightTalon1);
-		leftTalon2.follow(leftTalon1);
+		// rightTalon3.follow(rightTalon1);
+		// leftTalon2.follow(leftTalon1);
 		leftTalon3.follow(leftTalon1);
 
 		rightTalon1.setInverted(true);
 		rightTalon2.setInverted(InvertType.FollowMaster);
-		rightTalon3.setInverted(InvertType.FollowMaster);
+		// rightTalon3.setInverted(InvertType.FollowMaster);
+
+		
 
 		rightTalon1.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
 		leftTalon1.configIntegratedSensorInitializationStrategy(SensorInitializationStrategy.BootToZero);
+
+		// rightTalon1.configGetStatorCurrentLimit(currentLimit);
+		// rightTalon2.configGetStatorCurrentLimit(currentLimit);
+		// // rightTalon3.configGetStatorCurrentLimit(currentLimit);
+		// leftTalon1.configGetStatorCurrentLimit(currentLimit);
+		// // leftTalon2.configGetStatorCurrentLimit(currentLimit);
+		// leftTalon3.configGetStatorCurrentLimit(currentLimit);
 	}
 
 	/**
@@ -72,21 +81,130 @@ public class Drivetrain
 		}
 	}
 
-	double turnKP = 0.1;
-	double distanceKP = 0.1;
-	public void driveToAngle(double distance_inches, double endPose)
+	double turnKP = 0.01;
+	double distanceKP = 0.006;
+	public boolean driveToAngle(double distance_inches, double endPose)
 	{
 		double averageEncoderPosition = (leftTalon1.getSelectedSensorPosition() + rightTalon1.getSelectedSensorPosition()) / 2;
 		double desiredPosition = averageEncoderPosition + (distance_inches * ENC_TICKS_PER_INCH);
 		double distance_adjust = (desiredPosition - averageEncoderPosition) * distanceKP;
 		double angle_adjust = (endPose - Robot.navX.angle) * turnKP;
-		double left_command = angle_adjust + distance_adjust;
-		double right_command = -angle_adjust + distance_adjust;
+		double left_command = -angle_adjust + distance_adjust;
+		double right_command = angle_adjust + distance_adjust;
 		sigmaDrive(left_command, right_command);
+		return averageEncoderPosition > desiredPosition - 100 && averageEncoderPosition < desiredPosition + 100 
+		&& Robot.navX.angle > endPose - 2 && Robot.navX.angle < endPose + 2;
+	}
+
+	public boolean driveStraight(double distance_inches)
+	{
+		double averageEncoderPosition = (leftTalon1.getSelectedSensorPosition() + rightTalon1.getSelectedSensorPosition()) / 2;
+		double desiredPosition = averageEncoderPosition + (distance_inches * ENC_TICKS_PER_INCH);
+		double distance_adjust = (desiredPosition - averageEncoderPosition) * distanceKP;
+		sigmaDrive(distance_adjust, distance_adjust);
+		System.out.println("speed" + distance_adjust);
+		System.out.println("desiredPosition" + desiredPosition);
+		return averageEncoderPosition >= desiredPosition;
+	}
+	public int driveCounter = 0;
+	public int shootCounter = 0;
+	public void autoDrive()
+	{
+		sigmaDrive(0.2, 0.2);
+		if(driveCounter > 125)
+		{
+			sigmaDrive(0, 0);
+			if(shootCounter < 200)
+			{
+				Robot.ballMech.variableDistanceShooter();
+			}
+			else
+			{
+				Robot.ballMech.stopShooter();
+				Robot.ballMech.runRoller(0);
+				Robot.sigmaSight.counter = 0;
+				Robot.ballMech.counter = 0;
+				Robot.ballMech.shooterState = 0;
+			}
+			shootCounter++;
+		}
+		driveCounter++;
+	}
+
+	int autoState = 0, counter = 0;
+	public void autonomous()
+	{
+		switch(autoState)
+		{
+			case 0:
+			if(driveToAngle(100, 20))
+			{
+				autoState = 1;
+			}
+			break;
+
+			case 1:
+			Robot.ballMech.intake(-0.9);
+			if(Robot.ballMech.ballIsInRobot())
+			{
+				autoState = 2;
+			}
+			break;
+
+			case 2:
+			Robot.ballMech.stopIntake();
+			if(driveToAngle(0, 180))
+			{
+				autoState = 3;
+			}
+			break;
+
+			case 3:
+			Robot.ballMech.variableDistanceShooter();
+			if(counter > 150)
+			{
+				autoState = 4;
+			}
+			counter++;
+			break;
+
+			case 4:
+			if(driveToAngle(50, 0))
+			{
+				autoState = 5;
+			}
+			break;
+
+			case 5:
+			Robot.ballMech.intake(-0.9);
+			if(driveToAngle(100, 0))
+			{
+				autoState = 6;
+			}
+			break;
+			
+			case 6:
+			Robot.ballMech.stopIntake();
+			if(driveToAngle(0, 180))
+			{
+				autoState = 7;
+			}
+			break;
+
+			case 7:
+			Robot.ballMech.variableDistanceShooter();
+			if(counter > 150)
+			{
+				autoState = 4;
+			}
+			counter++;
+			break;
+		}
 	}
 
 	public void update()
 	{
 		SmartDashboard.putNumber("encoder", (leftTalon1.getSelectedSensorPosition() + rightTalon1.getSelectedSensorPosition()) / 2);
+		SmartDashboard.putNumber("angle", Robot.navX.angle);
 	}
 }

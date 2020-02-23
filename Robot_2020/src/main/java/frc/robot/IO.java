@@ -1,5 +1,7 @@
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
@@ -27,7 +29,7 @@ public class IO
         m_buttonY = mainController.getRawButtonPressed(4);
         m_leftBumper = mainController.getRawButton(5);
         m_leftBumperReleased = mainController.getRawButtonReleased(5);
-        m_rightBumper = mainController.getRawButtonPressed(6);
+        m_rightBumper = mainController.getRawButton(6);
         m_leftStick = mainController.getRawButton(9);
         m_rightStick = mainController.getRawButton(10);
         m_leftTrigger = mainController.getRawAxis(2);
@@ -45,7 +47,8 @@ public class IO
     {
         if(m_rightTrigger > 0.5)
         {
-            Robot.ballMech.variableDistanceShooter();;
+            Robot.ballMech.variableDistanceShooter();
+            // Robot.ballMech.shooterMotor1.set(ControlMode.PercentOutput, 0.9);
         }
         else
         {
@@ -58,12 +61,21 @@ public class IO
 
         // if(m_rightTrigger > 0.5)
         // {
-        //     Robot.ballMech.setShooterMotors(Robot.sigmaSight.desiredSpeed());
+        //     Robot.ballMech.setShooterMotors(rpm);
         // }
         // else
         // {
         //     Robot.ballMech.stopShooter();
         // }
+
+        if(m_DPad == 90)
+        {
+            rpm += 200;
+        }
+        if(m_DPad == 270)
+        {
+            rpm -= 200;
+        }
 
         if(m_leftTrigger > 0.5)
         {
@@ -79,7 +91,12 @@ public class IO
             Robot.ballMech.runRollerWithIntake();
             Robot.ballMech.intake(-0.90);
         }
-        else
+        else if(m_rightBumper)
+        {
+            Robot.ballMech.runRollerWithIntake();
+            Robot.ballMech.intake(0.90);
+        }
+        else if(!(m_rightTrigger > 0.5))
         {
             Robot.ballMech.stopIntake();
             Robot.ballMech.rollerState = 0;
@@ -124,6 +141,26 @@ public class IO
         else
         {
             Robot.climbMech.setClimbMotors(0);
+        }
+
+        // if(m_buttonX)
+        // {
+        //     Robot.drivetrain.autoDrive();
+        // }
+        // else
+        // {
+        //     Robot.drivetrain.shootCounter = 0;
+        //     Robot.drivetrain.driveCounter = 0;
+        // }
+
+        if(m_buttonB)
+        {
+            Robot.drivetrain.driveToAngle(0, 90);
+        }
+
+        if(m_leftStick)
+        {
+            Robot.drivetrain.driveToAngle(5, 90);
         }
 
         // if(m_buttonB)

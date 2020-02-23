@@ -158,11 +158,11 @@ public class SigmaSight
 
     public void turnOffLights()
     {
-        NetworkTableInstance.getDefault().getTable("limelight").getEntry("<ledMode>").setNumber(1);
+        NetworkTableInstance.getDefault().getTable("limelight-shooter").getEntry("ledMode").setNumber(1);
     }    
     
     public void turnOnLights()
     {
-        NetworkTableInstance.getDefault().getTable("limelight").getEntry("<ledMode>").setNumber(3);
+        NetworkTableInstance.getDefault().getTable("limelight-shooter").getEntry("ledMode").setNumber(3);
     }
 }

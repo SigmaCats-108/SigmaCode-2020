@@ -18,9 +18,10 @@ import frc.robot.RobotMap;
  */
 public class BallMech
 {
-	private TalonFX shooterMotor1 = new TalonFX(7);
+	public TalonFX shooterMotor1 = new TalonFX(7);
 	private TalonFX shooterMotor2 = new TalonFX(8);
 	private CANSparkMax intakeMotor = new CANSparkMax(1, MotorType.kBrushless);
+	private CANSparkMax intakeMotor2 = new CANSparkMax(6, MotorType.kBrushless);
 	public CANSparkMax rollerMotor = new CANSparkMax(2, MotorType.kBrushed);
 	private DoubleSolenoid intakeCylinder = new DoubleSolenoid(RobotMap.PCM2 ,RobotMap.INTAKE_EXTENDER_FWD , RobotMap.INTAKE_EXTENDER_REV);
 	private Ultrasonic ballSensor_intake = new Ultrasonic(5, 4);
@@ -35,7 +36,6 @@ public class BallMech
 		shooterMotor1.config_kP(RobotMap.kPIDLoopIdx, RobotMap.kP, RobotMap.kTimeoutMs);
 		shooterMotor1.config_kI(RobotMap.kPIDLoopIdx, RobotMap.kI, RobotMap.kTimeoutMs);
 		shooterMotor1.config_kD(RobotMap.kPIDLoopIdx, RobotMap.kD, RobotMap.kTimeoutMs);
-		
 		shooterMotor2.follow(shooterMotor1);
 		shooterMotor2.setInverted(InvertType.OpposeMaster);
 		ballSensor_intake.setAutomaticMode(true);
@@ -45,6 +45,7 @@ public class BallMech
 	public void update()
 	{
 		SmartDashboard.putNumber("velocity", shooterMotor1.getSelectedSensorVelocity());
+		SmartDashboard.putNumber("desired speed", Robot.sigmaSight.desiredSpeed());
 		SmartDashboard.putNumber("ballsensor intake", ballSensor_intake.getRangeInches());
 	}
 
@@ -56,6 +57,7 @@ public class BallMech
 		if(intakeCounter > 40)
 		{
 			intakeMotor.set(speed);
+			intakeMotor2.set(0.2);
 		}
 	}
 
@@ -81,9 +83,16 @@ public class BallMech
 	public void stopIntake()
 	{
 		intakeMotor.set(0);
+		intakeMotor2.set(0);
 		extendIntake(false);
 		intakeCounter = 0;
 	}
+
+	public boolean ballIsInRobot()
+	{
+		return ballSensor_intake.getRangeInches() < 4;
+	}
+
 	public int counter = 0;
 	public boolean setShooterMotors(double speed)
 	{
@@ -103,7 +112,8 @@ public class BallMech
 
 	public void stopShooter()
 	{
-		shooterMotor1.set(ControlMode.PercentOutput, 0);
+		shooterMotor1.set(ControlMode.PercentOutput, 0);Robot.sigmaSight.turnOffLights();
+		intakeMotor2.set(0);
 	}
 
 	public void runRoller(double speed)
@@ -135,7 +145,7 @@ public class BallMech
 		return ballCount;
 	}
 
-	public void moveBalls()
+	public void testicularRetraction()
 	{
 		if(ballCount() >= 3 && ballSensor_shooter.getRangeInches() > 30)
 		{
@@ -162,6 +172,7 @@ public class BallMech
 	public int shooterState = 0;
 	public void variableDistanceShooter()
 	{
+		Robot.sigmaSight.turnOnLights();
 		switch(shooterState)
 		{
 			case 0:
@@ -181,6 +192,8 @@ public class BallMech
 
 			case 2:
 			runRoller(-1);
+			intakeMotor2.set(0.2);
+			intakeMotor.set(0.1);
 			break;
 		}
 	}
