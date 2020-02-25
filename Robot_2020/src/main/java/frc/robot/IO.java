@@ -41,6 +41,7 @@ public class IO
         m_DPad = mainController.getPOV();
         m_pauseButton = mainController.getRawButtonPressed(8);
         SmartDashboard.putNumber("D pad", m_DPad);
+        SmartDashboard.putNumber("rpm", rpm);
     }
 
     public static void update()
@@ -161,12 +162,12 @@ public class IO
 
         // if(m_buttonB)
         // {
-        //     Robot.drivetrain.driveStraight(0.2);
+        //     Robot.drivetrain.turnAngle(-180);
         // }
         // else
         // {
-        //     Robot.drivetrain.sigmaDrive(0, 0);
-        //     Robot.drivetrain.driveStraightState = 0;
+        //     // Robot.drivetrain.sigmaDrive(0, 0);
+        //     // Robot.drivetrain.driveStraightState = 0;
         // }
 
         // if(m_leftStick)

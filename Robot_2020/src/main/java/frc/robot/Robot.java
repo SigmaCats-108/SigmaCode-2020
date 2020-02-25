@@ -42,22 +42,28 @@ public class Robot extends TimedRobot
         sigmaSight.testValues();
         drivetrain.update();
         navX.updateAHRS();
+        navX.update();
         ballMech.update();
         wheelOfFortune.updateColors();
         climbMech.update();
         IO.update();
+        sigmaSight.turnOnLights();
     }
     
     @Override
     public void autonomousInit() 
     {
-  
+        Robot.navX.resetAngle();
+        Robot.drivetrain.autoState = 0;
+        Robot.drivetrain.driveStraightState = 0;
     }
-    
+    // int autoState = 0;
     @Override
     public void autonomousPeriodic()
     {
-        // Robot.drivetrain.autoDrive();        
+        // Robot.sigmaSight.turnOnLights();
+        // Robot.drivetrain.autoDrive();
+        Robot.drivetrain.sixBallAuto(100, 10);
     }
 
     @Override
@@ -66,7 +72,8 @@ public class Robot extends TimedRobot
         Robot.drivetrain.rightTalon1.configGetStatorCurrentLimit(currentLimit,1000);
 		Robot.drivetrain.rightTalon2.configGetStatorCurrentLimit(currentLimit,1000);
 		Robot.drivetrain.leftTalon1.configGetStatorCurrentLimit(currentLimit,1000);
-		Robot.drivetrain.leftTalon3.configGetStatorCurrentLimit(currentLimit,1000);
+        Robot.drivetrain.leftTalon3.configGetStatorCurrentLimit(currentLimit,1000);
+        Robot.navX.resetAngle();
     }
 
     @Override

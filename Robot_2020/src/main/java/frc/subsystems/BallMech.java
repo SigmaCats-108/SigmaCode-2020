@@ -112,7 +112,7 @@ public class BallMech
 			counter++;
 			System.out.println("counter " + counter);
 		}
-		return counter > 20;
+		return counter > 30;
 	}
 
 	public void testShooterMotors(double speed)
@@ -122,7 +122,8 @@ public class BallMech
 
 	public void stopShooter()
 	{
-		shooterMotor1.set(ControlMode.PercentOutput, 0);Robot.sigmaSight.turnOffLights();
+		shooterMotor1.set(ControlMode.PercentOutput, 0);
+		Robot.sigmaSight.turnOffLights();
 		intakeMotor2.set(0);
 	}
 

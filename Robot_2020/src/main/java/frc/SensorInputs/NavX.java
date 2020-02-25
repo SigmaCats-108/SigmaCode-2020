@@ -2,6 +2,7 @@ package frc.SensorInputs;
 
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class NavX
 {
@@ -26,8 +27,8 @@ public class NavX
         AHRS.zeroYaw();
     }
 
-    public void testAngle()
+    public void update()
     {
-       // System.out.println("Yaw: " + yaw + " Yaw (Unclamped): " + angle + " Pitch: " + pitch + " Roll: " + roll);
+        SmartDashboard.putNumber("angle", angle);
     }
 }

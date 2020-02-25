@@ -82,10 +82,10 @@ public class Drivetrain
 	}
 
 	double turnKP = 0.01;
-	double distanceKP = 0.00001;
+	double distanceKP = 0.000003;
 	public boolean driveToAngle(double distance_inches, double endPose)
 	{
-		double averageEncoderPosition = (leftTalon1.getSelectedSensorPosition() + rightTalon1.getSelectedSensorPosition()) / 2;
+		double averageEncoderPosition = -rightTalon1.getSelectedSensorPosition();
 		double desiredPosition = averageEncoderPosition + (distance_inches * ENC_TICKS_PER_INCH);
 		double distance_adjust = (desiredPosition - averageEncoderPosition) * distanceKP;
 		double angle_adjust = (endPose - Robot.navX.angle) * turnKP;
@@ -96,23 +96,40 @@ public class Drivetrain
 		&& Robot.navX.angle > endPose - 2 && Robot.navX.angle < endPose + 2;
 	}
 
+	public boolean turnAngle(double angle)
+	{
+		double speed = (angle - Robot.navX.angle) * 0.006;
+		sigmaDrive(-speed, speed);
+		if(Math.abs(angle - Robot.navX.angle) < 5)
+		{
+			sigmaDrive(0, 0);
+			return true;
+		}
+		return false;
+	}
+
 	public int driveStraightState = 0;
 	double desiredPosition = 0, averageEncoderPosition = 0;
 	double distance_adjust = 0;
-	public void driveStraight(double distance_inches)
+	double currentAngle = 0;
+	public boolean driveStraight(double distance_inches)
 	{
 		switch(driveStraightState)
 		{
 			case 0:
-			averageEncoderPosition = rightTalon1.getSelectedSensorPosition();
-			desiredPosition = averageEncoderPosition + (distance_inches * -ENC_TICKS_PER_INCH);
+			averageEncoderPosition = -rightTalon1.getSelectedSensorPosition();
+			desiredPosition = averageEncoderPosition + (distance_inches * ENC_TICKS_PER_INCH);
 			driveStraightState = 1;
+			currentAngle = Robot.navX.angle;
 			break;
 
 			case 1:
-			distance_adjust = (desiredPosition + averageEncoderPosition) * distanceKP;
-			sigmaDrive(-distance_adjust, -distance_adjust);
-			if(averageEncoderPosition <= desiredPosition)
+			double angle_adjust = (currentAngle - Robot.navX.angle) * 0.028;
+			distance_adjust = (desiredPosition - (-rightTalon1.getSelectedSensorPosition())) * distanceKP;
+			sigmaDrive(-distance_adjust - angle_adjust, -distance_adjust + angle_adjust);
+			System.out.println("speed" + distance_adjust);
+			System.out.println("desired" + desiredPosition);
+			if(Math.abs(distance_adjust) < 0.1)
 			{
 				driveStraightState = 2;
 			}
@@ -121,8 +138,9 @@ public class Drivetrain
 			case 2:
 			sigmaDrive(0, 0);
 			System.out.println("FINISHED");
-			break;
+			return true;
 		}
+		return false;
 	}
 
 	public int driveCounter = 0;
@@ -150,7 +168,8 @@ public class Drivetrain
 		driveCounter++;
 	}
 
-	int autoState = 0, counter = 0;
+	public int autoState = 0;
+	int counter = 0;
 	public void autonomous()
 	{
 		switch(autoState)
@@ -221,40 +240,47 @@ public class Drivetrain
 		}
 	}
 
+	int sixBallAutoCounter = 0;
 	public void sixBallAuto(double distance_inches, double endPose)
 	{
 		switch(autoState)
 		{
 			case 0:
 			Robot.ballMech.variableDistanceShooter();
-			if(counter > 150)
+			if(sixBallAutoCounter > 200)
 			{
+				Robot.ballMech.stopShooter();
+				Robot.ballMech.runRoller(0);
+				Robot.sigmaSight.counter = 0;
+				Robot.ballMech.counter = 0;
+				Robot.ballMech.shooterState = 0;
 				autoState = 1;
 			}
-			counter++;
+			sixBallAutoCounter++;
 			break;
 
 			case 1:
-			if(driveToAngle(0, 180))
+			if(turnAngle(-176))
 			{
 				autoState = 2;
 			}
 			break;
 
 			case 2:
-			Robot.ballMech.intake(-0.9);
-			if(driveToAngle(distance_inches, endPose))
+			// Robot.ballMech.intake(-1);
+			System.out.println("driving straight");
+			if(driveStraight(200))
 			{
 				autoState = 3;
 			}
 			break;
 
 			case 3:
-			Robot.ballMech.stopIntake();
-			if(driveToAngle(0, 0))
-			{
-				autoState = 3;
-			}
+			// Robot.ballMech.stopIntake();
+			// if(driveToAngle(0, 0))
+			// {
+			// 	autoState = 3;
+			// }
 			break;
 
 			case 4:
@@ -269,7 +295,5 @@ public class Drivetrain
 		SmartDashboard.putNumber("leftenc", leftTalon1.getSelectedSensorPosition());
 		SmartDashboard.putNumber("rightenc", rightTalon1.getSelectedSensorPosition());
 		SmartDashboard.putNumber("angle", Robot.navX.angle);
-		System.out.println("speed" + distance_adjust);
-		System.out.println("desiredPosition" + desiredPosition);
 	}
 }
