@@ -45,10 +45,7 @@ public class Robot extends TimedRobot
         ballMech.update();
         wheelOfFortune.updateColors();
         climbMech.update();
-        // TalonFXConfiguration eafd = new TalonFXConfiguration();
-        // Robot.drivetrain.rightTalon1.getAllConfigs(eafd);
-        // System.out.println(eafd.toString());
-        // Robot.drivetrain.rightTalon1.configGetParameter(ParamEnum., ordinal, timeoutMs)
+        IO.update();
     }
     
     @Override
@@ -60,8 +57,7 @@ public class Robot extends TimedRobot
     @Override
     public void autonomousPeriodic()
     {
-        Robot.drivetrain.autoDrive();
-        
+        // Robot.drivetrain.autoDrive();        
     }
 
     @Override

@@ -22,6 +22,7 @@ public class BallMech
 	private TalonFX shooterMotor2 = new TalonFX(8);
 	private CANSparkMax intakeMotor = new CANSparkMax(1, MotorType.kBrushless);
 	private CANSparkMax intakeMotor2 = new CANSparkMax(6, MotorType.kBrushless);
+	private CANSparkMax intakeMotor3 = new CANSparkMax(7, MotorType.kBrushless);
 	public CANSparkMax rollerMotor = new CANSparkMax(2, MotorType.kBrushed);
 	private DoubleSolenoid intakeCylinder = new DoubleSolenoid(RobotMap.PCM2 ,RobotMap.INTAKE_EXTENDER_FWD , RobotMap.INTAKE_EXTENDER_REV);
 	private Ultrasonic ballSensor_intake = new Ultrasonic(5, 4);
@@ -40,6 +41,7 @@ public class BallMech
 		shooterMotor2.setInverted(InvertType.OpposeMaster);
 		ballSensor_intake.setAutomaticMode(true);
 		intakeMotor.setIdleMode(IdleMode.kCoast);
+		intakeMotor3.follow(intakeMotor2, true);
 	}
 
 	public void update()
@@ -64,20 +66,28 @@ public class BallMech
 	public int rollerState = 0;
 	public void runRollerWithIntake()
 	{
-		switch(rollerState)
+		if(ballSensor_intake.getRangeInches() < 4)
 		{
-			case 0:
-			rollerMotor.set(-0.4);
-			if(ballSensor_intake.getRangeInches() < 4)
-			{
-				rollerState = 1;
-			}
-			break;
-
-			case 1:
 			rollerMotor.set(0);
-			break;
 		}
+		else
+		{
+			rollerMotor.set(-0.4);
+		}
+		// switch(rollerState)
+		// {
+		// 	case 0:
+		// 	rollerMotor.set(-0.4);
+		// 	if(ballSensor_intake.getRangeInches() < 4)
+		// 	{
+		// 		rollerState = 1;
+		// 	}
+		// 	break;
+
+		// 	case 1:
+		// 	rollerMotor.set(0);
+		// 	break;
+		// }
 	}
 
 	public void stopIntake()

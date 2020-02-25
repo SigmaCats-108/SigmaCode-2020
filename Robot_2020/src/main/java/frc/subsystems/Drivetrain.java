@@ -60,7 +60,7 @@ public class Drivetrain
 	 */
 	public void sigmaDrive(double leftSpeed, double rightSpeed)
 	{
-		rightTalon1.set(ControlMode.PercentOutput, rightSpeed);
+		rightTalon1.set(ControlMode.PercentOutput, rightSpeed); //motor broken
 		leftTalon1.set(ControlMode.PercentOutput, leftSpeed);
 	}
 
@@ -82,7 +82,7 @@ public class Drivetrain
 	}
 
 	double turnKP = 0.01;
-	double distanceKP = 0.006;
+	double distanceKP = 0.00001;
 	public boolean driveToAngle(double distance_inches, double endPose)
 	{
 		double averageEncoderPosition = (leftTalon1.getSelectedSensorPosition() + rightTalon1.getSelectedSensorPosition()) / 2;
@@ -96,16 +96,35 @@ public class Drivetrain
 		&& Robot.navX.angle > endPose - 2 && Robot.navX.angle < endPose + 2;
 	}
 
-	public boolean driveStraight(double distance_inches)
+	public int driveStraightState = 0;
+	double desiredPosition = 0, averageEncoderPosition = 0;
+	double distance_adjust = 0;
+	public void driveStraight(double distance_inches)
 	{
-		double averageEncoderPosition = (leftTalon1.getSelectedSensorPosition() + rightTalon1.getSelectedSensorPosition()) / 2;
-		double desiredPosition = averageEncoderPosition + (distance_inches * ENC_TICKS_PER_INCH);
-		double distance_adjust = (desiredPosition - averageEncoderPosition) * distanceKP;
-		sigmaDrive(distance_adjust, distance_adjust);
-		System.out.println("speed" + distance_adjust);
-		System.out.println("desiredPosition" + desiredPosition);
-		return averageEncoderPosition >= desiredPosition;
+		switch(driveStraightState)
+		{
+			case 0:
+			averageEncoderPosition = rightTalon1.getSelectedSensorPosition();
+			desiredPosition = averageEncoderPosition + (distance_inches * -ENC_TICKS_PER_INCH);
+			driveStraightState = 1;
+			break;
+
+			case 1:
+			distance_adjust = (desiredPosition + averageEncoderPosition) * distanceKP;
+			sigmaDrive(-distance_adjust, -distance_adjust);
+			if(averageEncoderPosition <= desiredPosition)
+			{
+				driveStraightState = 2;
+			}
+			break;
+
+			case 2:
+			sigmaDrive(0, 0);
+			System.out.println("FINISHED");
+			break;
+		}
 	}
+
 	public int driveCounter = 0;
 	public int shootCounter = 0;
 	public void autoDrive()
@@ -202,9 +221,55 @@ public class Drivetrain
 		}
 	}
 
+	public void sixBallAuto(double distance_inches, double endPose)
+	{
+		switch(autoState)
+		{
+			case 0:
+			Robot.ballMech.variableDistanceShooter();
+			if(counter > 150)
+			{
+				autoState = 1;
+			}
+			counter++;
+			break;
+
+			case 1:
+			if(driveToAngle(0, 180))
+			{
+				autoState = 2;
+			}
+			break;
+
+			case 2:
+			Robot.ballMech.intake(-0.9);
+			if(driveToAngle(distance_inches, endPose))
+			{
+				autoState = 3;
+			}
+			break;
+
+			case 3:
+			Robot.ballMech.stopIntake();
+			if(driveToAngle(0, 0))
+			{
+				autoState = 3;
+			}
+			break;
+
+			case 4:
+			Robot.ballMech.variableDistanceShooter();
+			break;
+		}
+	}
+
 	public void update()
 	{
 		SmartDashboard.putNumber("encoder", (leftTalon1.getSelectedSensorPosition() + rightTalon1.getSelectedSensorPosition()) / 2);
+		SmartDashboard.putNumber("leftenc", leftTalon1.getSelectedSensorPosition());
+		SmartDashboard.putNumber("rightenc", rightTalon1.getSelectedSensorPosition());
 		SmartDashboard.putNumber("angle", Robot.navX.angle);
+		System.out.println("speed" + distance_adjust);
+		System.out.println("desiredPosition" + desiredPosition);
 	}
 }

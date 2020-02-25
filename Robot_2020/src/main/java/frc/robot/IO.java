@@ -43,6 +43,12 @@ public class IO
         SmartDashboard.putNumber("D pad", m_DPad);
     }
 
+    public static void update()
+    {
+        SmartDashboard.putNumber("leftanalog", m_leftAnalogY);
+        SmartDashboard.putNumber("rightanalog", m_rightAnalogY);
+    }
+
     public static void ProcessControllers()
     {
         if(m_rightTrigger > 0.5)
@@ -89,12 +95,12 @@ public class IO
         if(m_leftBumper)
         {
             Robot.ballMech.runRollerWithIntake();
-            Robot.ballMech.intake(-0.90);
+            Robot.ballMech.intake(-1);
         }
         else if(m_rightBumper)
         {
             Robot.ballMech.runRollerWithIntake();
-            Robot.ballMech.intake(0.90);
+            Robot.ballMech.intake(1);
         }
         else if(!(m_rightTrigger > 0.5))
         {
@@ -122,8 +128,8 @@ public class IO
             Robot.wheelOfFortune.WOFmotor.set(0);
             Robot.wheelOfFortune.WOFencoder.setPosition(0);
         }
-        Robot.wheelOfFortune.ruvib();
-        System.out.println("WOF enc: " + Robot.wheelOfFortune.WOFencoder.getPosition());
+        // Robot.wheelOfFortune.ruvib();
+        // System.out.println("WOF enc: " + Robot.wheelOfFortune.WOFencoder.getPosition());
 
         if(m_pauseButton)
         {
@@ -153,15 +159,20 @@ public class IO
         //     Robot.drivetrain.driveCounter = 0;
         // }
 
-        if(m_buttonB)
-        {
-            Robot.drivetrain.driveToAngle(0, 90);
-        }
+        // if(m_buttonB)
+        // {
+        //     Robot.drivetrain.driveStraight(0.2);
+        // }
+        // else
+        // {
+        //     Robot.drivetrain.sigmaDrive(0, 0);
+        //     Robot.drivetrain.driveStraightState = 0;
+        // }
 
-        if(m_leftStick)
-        {
-            Robot.drivetrain.driveToAngle(5, 90);
-        }
+        // if(m_leftStick)
+        // {
+        //     Robot.drivetrain.driveToAngle(5, 90);
+        // }
 
         // if(m_buttonB)
         // {
