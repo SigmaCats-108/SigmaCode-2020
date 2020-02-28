@@ -8,20 +8,20 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 // import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Robot;
 import frc.robot.RobotMap;
-import edu.wpi.first.wpilibj.AnalogInput;
-
 
 public class ClimbMech
 {
     private CANSparkMax climbMotor1 = new CANSparkMax(RobotMap.CLIMBMECH_MOTOR1, MotorType.kBrushless);
     private CANSparkMax climbMotor2 = new CANSparkMax(RobotMap.CLIMBMECH_MOTOR2, MotorType.kBrushless);
+    public CANSparkMax weirdClimbMotor = new CANSparkMax(RobotMap.WEIRD_CLIMBMECH_MOTOR2, MotorType.kBrushed);
     private CANEncoder climbEncoder = new CANEncoder(climbMotor1);
 
-    private DoubleSolenoid hangerSolenoid = new DoubleSolenoid(RobotMap.PCM2 ,RobotMap.HANGER_FWD , RobotMap.HANGER_REV);
+    public DoubleSolenoid hangerSolenoid = new DoubleSolenoid(RobotMap.PCM2 ,RobotMap.HANGER_FWD , RobotMap.HANGER_REV);
     
     // private DigitalInput limitSwitch = new DigitalInput(0);
-    private AnalogInput sens = new AnalogInput(0);
+    // private AnalogInput sens = new AnalogInput(0);
 
     public ClimbMech()
     {
@@ -36,7 +36,15 @@ public class ClimbMech
     public void update()
     {
         SmartDashboard.putNumber("climb encoder", climbEncoder.getPosition());
-        SmartDashboard.putNumber("ultrasonic srgf", sens.getValue());
+        if(hangerSolenoid.get() == Value.kForward)
+        {
+            SmartDashboard.putNumber("kjjkug", 1);
+        }
+        else
+        {
+            SmartDashboard.putNumber("ihiugbi", 2);
+        }
+        // SmartDashboard.putNumber("ultrasonic srgf", sens.getValue());
     }
 
     public void extendHanger()
@@ -66,18 +74,5 @@ public class ClimbMech
         {
             setClimbMotors(0);
         }
-	}
-
-    // public void liftRobot()
-    // {
-    //     if(!limitSwitch.get())
-    //     {
-    //         setClimbMotors(0.5);
-    //     }
-    //     else
-    //     {
-    //         setClimbMotors(0);
-    //     }
-    // }
-    
+    }    
 }

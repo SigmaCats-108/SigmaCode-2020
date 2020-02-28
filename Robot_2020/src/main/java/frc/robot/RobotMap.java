@@ -24,6 +24,10 @@ public class RobotMap
 	//climbMech ID Values
 	public static final int CLIMBMECH_MOTOR1 = 3;
 	public static final int CLIMBMECH_MOTOR2 = 4;
+	public static final int WEIRD_CLIMBMECH_MOTOR2 = 9;
+
+	//wheel of fortune
+	public static final int WOF_MOTOR = 5;
 
 	// Vision System Constants
 	public static final double HATCH_VISION_TURN_PGAIN = -0.035;

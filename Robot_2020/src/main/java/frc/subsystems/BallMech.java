@@ -25,8 +25,8 @@ public class BallMech
 	private CANSparkMax intakeMotor3 = new CANSparkMax(7, MotorType.kBrushless);
 	public CANSparkMax rollerMotor = new CANSparkMax(2, MotorType.kBrushed);
 	private DoubleSolenoid intakeCylinder = new DoubleSolenoid(RobotMap.PCM2 ,RobotMap.INTAKE_EXTENDER_FWD , RobotMap.INTAKE_EXTENDER_REV);
-	private Ultrasonic ballSensor_intake = new Ultrasonic(5, 4);
-	private Ultrasonic ballSensor_shooter = new Ultrasonic(2, 3);
+	private Ultrasonic ballSensor_intake = new Ultrasonic(4, 5);
+	// private Ultrasonic ballSensor_shooter = new Ultrasonic(2, 3);
 	
 	public BallMech()
 	{
@@ -54,12 +54,14 @@ public class BallMech
 	public int intakeCounter = 0;
 	public void intake(double speed)
 	{
+		// System.out.println("intaking");
 		intakeCounter++;
 		extendIntake(true);
 		if(intakeCounter > 40)
 		{
 			intakeMotor.set(speed);
 			intakeMotor2.set(0.2);
+			// System.out.println("hit 40");
 		}
 	}
 
@@ -96,6 +98,8 @@ public class BallMech
 		intakeMotor2.set(0);
 		extendIntake(false);
 		intakeCounter = 0;
+
+		// System.out.println("stop Intake");
 	}
 
 	public boolean ballIsInRobot()
@@ -110,7 +114,7 @@ public class BallMech
 		if(Math.abs(shooterMotor1.getSelectedSensorVelocity() - speed) < 1000)
 		{
 			counter++;
-			System.out.println("counter " + counter);
+			// System.out.println("counter " + counter);
 		}
 		return counter > 30;
 	}
@@ -156,17 +160,17 @@ public class BallMech
 		return ballCount;
 	}
 
-	public void testicularRetraction()
-	{
-		if(ballCount() >= 3 && ballSensor_shooter.getRangeInches() > 30)
-		{
-			runRoller(0.5);
-		}
-		else
-		{
-			runRoller(0);
-		}
-	}
+	// public void testicularRetraction()
+	// {
+	// 	if(ballCount() >= 3 && ballSensor_shooter.getRangeInches() > 30)
+	// 	{
+	// 		runRoller(0.5);
+	// 	}
+	// 	else
+	// 	{
+	// 		runRoller(0);
+	// 	}
+	// }
 
 	public void extendIntake(boolean intakeState)
 	{
@@ -187,7 +191,7 @@ public class BallMech
 		switch(shooterState)
 		{
 			case 0:
-			shooterMotor1.set(ControlMode.PercentOutput, 0.8);
+			shooterMotor1.set(ControlMode.PercentOutput, -0.8);
 			if (Robot.sigmaSight.lineUpToShoot())
 			{
 				shooterState = 1;
@@ -195,7 +199,7 @@ public class BallMech
 			break;
 
 			case 1:
-			if(setShooterMotors(Robot.sigmaSight.desiredSpeed()))
+			if(setShooterMotors(-Robot.sigmaSight.desiredSpeed()))
 			{
 				shooterState = 2;
 			}

@@ -127,9 +127,9 @@ public class Drivetrain
 			double angle_adjust = (currentAngle - Robot.navX.angle) * 0.028;
 			distance_adjust = (desiredPosition - (-rightTalon1.getSelectedSensorPosition())) * distanceKP;
 			sigmaDrive(-distance_adjust - angle_adjust, -distance_adjust + angle_adjust);
-			System.out.println("speed" + distance_adjust);
-			System.out.println("desired" + desiredPosition);
-			if(Math.abs(distance_adjust) < 0.1)
+			// System.out.println("speed" + distance_adjust);
+			// System.out.println("desired" + desiredPosition);
+			if(Math.abs(distance_adjust) < 0.2)
 			{
 				driveStraightState = 2;
 			}
@@ -137,36 +137,36 @@ public class Drivetrain
 
 			case 2:
 			sigmaDrive(0, 0);
-			System.out.println("FINISHED");
+			// System.out.println("FINISHED");
 			return true;
 		}
 		return false;
 	}
 
-	public int driveCounter = 0;
-	public int shootCounter = 0;
-	public void autoDrive()
-	{
-		sigmaDrive(0.2, 0.2);
-		if(driveCounter > 125)
-		{
-			sigmaDrive(0, 0);
-			if(shootCounter < 200)
-			{
-				Robot.ballMech.variableDistanceShooter();
-			}
-			else
-			{
-				Robot.ballMech.stopShooter();
-				Robot.ballMech.runRoller(0);
-				Robot.sigmaSight.counter = 0;
-				Robot.ballMech.counter = 0;
-				Robot.ballMech.shooterState = 0;
-			}
-			shootCounter++;
-		}
-		driveCounter++;
-	}
+	// public int driveCounter = 0;
+	// public int shootCounter = 0;
+	// public void autoDrive()
+	// {
+	// 	sigmaDrive(0.2, 0.2);
+	// 	if(driveCounter > 125)
+	// 	{
+	// 		sigmaDrive(0, 0);
+	// 		if(shootCounter < 200)
+	// 		{
+	// 			Robot.ballMech.variableDistanceShooter();
+	// 		}
+	// 		else
+	// 		{
+	// 			Robot.ballMech.stopShooter();
+	// 			Robot.ballMech.runRoller(0);
+	// 			Robot.sigmaSight.counter = 0;
+	// 			Robot.ballMech.counter = 0;
+	// 			Robot.ballMech.shooterState = 0;
+	// 		}
+	// 		shootCounter++;
+	// 	}
+	// 	driveCounter++;
+	// }
 
 	public int autoState = 0;
 	int counter = 0;
@@ -240,14 +240,14 @@ public class Drivetrain
 		}
 	}
 
-	int sixBallAutoCounter = 0;
-	public void sixBallAuto(double distance_inches, double endPose)
+	int autoCounter = 0;
+	public void sixBallAuto()
 	{
 		switch(autoState)
 		{
 			case 0:
 			Robot.ballMech.variableDistanceShooter();
-			if(sixBallAutoCounter > 200)
+			if(autoCounter > 200)
 			{
 				Robot.ballMech.stopShooter();
 				Robot.ballMech.runRoller(0);
@@ -256,7 +256,61 @@ public class Drivetrain
 				Robot.ballMech.shooterState = 0;
 				autoState = 1;
 			}
-			sixBallAutoCounter++;
+			autoCounter++;
+			break;
+
+			case 1:
+			if(turnAngle(-181))
+			{
+				autoState = 2;
+			}
+			break;
+
+			case 2:
+			Robot.ballMech.intake(-1);
+			// System.out.println("driving straight");
+			if(driveStraight(140))
+			{
+				autoState = 3;
+			}
+			break;
+
+			case 3:
+			Robot.ballMech.stopIntake();
+			if(turnAngle(0))
+			{
+				autoState = 4;
+			}
+			break;
+
+			case 4:
+			if(driveStraight(75))
+			{
+				autoState = 5;
+			}
+
+			case 5:
+			Robot.ballMech.variableDistanceShooter();
+			break;
+		}
+	}
+
+	public void eightBallAuto(double distance_inches, double endPose)
+	{
+		switch(autoState)
+		{
+			case 0:
+			Robot.ballMech.variableDistanceShooter();
+			if(autoCounter > 200)
+			{
+				Robot.ballMech.stopShooter();
+				Robot.ballMech.runRoller(0);
+				Robot.sigmaSight.counter = 0;
+				Robot.ballMech.counter = 0;
+				Robot.ballMech.shooterState = 0;
+				autoState = 1;
+			}
+			autoCounter++;
 			break;
 
 			case 1:
@@ -268,32 +322,64 @@ public class Drivetrain
 
 			case 2:
 			// Robot.ballMech.intake(-1);
-			System.out.println("driving straight");
-			if(driveStraight(200))
+			// System.out.println("driving straight");
+			if(driveStraight(250))
 			{
 				autoState = 3;
 			}
 			break;
 
 			case 3:
-			// Robot.ballMech.stopIntake();
-			// if(driveToAngle(0, 0))
-			// {
-			// 	autoState = 3;
-			// }
+			Robot.ballMech.stopIntake();
+			if(driveStraight(-150))
+			{
+				autoState = 4;
+			}
 			break;
 
 			case 4:
+			if(turnAngle(0))
+			{
+				autoState = 5;
+			}
+			break;
+
+			case 5:
 			Robot.ballMech.variableDistanceShooter();
+			break;
+		}
+	}
+
+	public void threeBallAuto()
+	{
+		switch(autoState)
+		{
+			case 0:
+			Robot.ballMech.variableDistanceShooter();
+			if(autoCounter > 250)
+			{
+				Robot.ballMech.stopShooter();
+				Robot.ballMech.runRoller(0);
+				Robot.sigmaSight.counter = 0;
+				Robot.ballMech.counter = 0;
+				Robot.ballMech.shooterState = 0;
+				autoState = 1;
+			}
+			autoCounter++;
+			break;
+
+			case 1:
+			driveStraight(-70);
 			break;
 		}
 	}
 
 	public void update()
 	{
-		SmartDashboard.putNumber("encoder", (leftTalon1.getSelectedSensorPosition() + rightTalon1.getSelectedSensorPosition()) / 2);
-		SmartDashboard.putNumber("leftenc", leftTalon1.getSelectedSensorPosition());
-		SmartDashboard.putNumber("rightenc", rightTalon1.getSelectedSensorPosition());
-		SmartDashboard.putNumber("angle", Robot.navX.angle);
+		// SmartDashboard.putNumber("encoder", (leftTalon1.getSelectedSensorPosition() + rightTalon1.getSelectedSensorPosition()) / 2);
+		// SmartDashboard.putNumber("leftenc", leftTalon1.getSelectedSensorPosition());
+		// SmartDashboard.putNumber("rightenc", rightTalon1.getSelectedSensorPosition());
+		// SmartDashboard.putNumber("angle", Robot.navX.angle);
+		SmartDashboard.putNumber("outputcurrent", rightTalon1.getSupplyCurrent());
 	}
 }

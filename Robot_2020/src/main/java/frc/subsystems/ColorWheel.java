@@ -23,7 +23,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 public class ColorWheel
 {
-	public CANSparkMax WOFmotor = new CANSparkMax(5, MotorType.kBrushless);
+	public CANSparkMax WOFmotor = new CANSparkMax(RobotMap.WOF_MOTOR, MotorType.kBrushless);
 	public CANEncoder WOFencoder = WOFmotor.getEncoder();
 	private DoubleSolenoid WOFCylinder = new DoubleSolenoid(RobotMap.PCM1, RobotMap.WOF_FWD, RobotMap.WOF_REV);
 
@@ -33,7 +33,7 @@ public class ColorWheel
 	private final Color kBlueTarget = ColorMatch.makeColor(0.127, 0.424, 0.444);
     private final Color kGreenTarget = ColorMatch.makeColor(0.166, 0.577, 0.257);
     private final Color kRedTarget = ColorMatch.makeColor(0.520, 0.346, 0.133);
-    private final Color kYellowTarget = ColorMatch.makeColor(0.318, 0.357, 0.125);
+    private final Color kYellowTarget = ColorMatch.makeColor(0.310, 0.5644, 0.1252);
     private final Color kNothing = ColorMatch.makeColor(0.291, 0.468, 0.239);
 	
 	public ColorWheel()
@@ -51,9 +51,9 @@ public class ColorWheel
 	public void updateColors()
 	{
 		Color detectedColor = colorSensor.getColor();
-		SmartDashboard.putNumber("Red", detectedColor.red);
-		SmartDashboard.putNumber("Green", detectedColor.green);
-		SmartDashboard.putNumber("Blue", detectedColor.blue);
+		// SmartDashboard.putNumber("Red", detectedColor.red);
+		// SmartDashboard.putNumber("Green", detectedColor.green);
+		// SmartDashboard.putNumber("Blue", detectedColor.blue);
 	}
 
 	public void ruvib()
@@ -118,8 +118,8 @@ public class ColorWheel
 			case 'B' :
 			if(match.color != kRedTarget)
 			{
-				WOFmotor.set(0.4);
-				System.out.println("Blue");
+				WOFmotor.set(0.25);
+				// System.out.println("Blue");
 			}
 			else
 			{
@@ -132,8 +132,8 @@ public class ColorWheel
 			case 'G' :
 			if(match.color != kYellowTarget)
 			{
-				WOFmotor.set(0.4);
-				System.out.println("Green");
+				WOFmotor.set(0.25);
+				// System.out.println("Green");
 			}
 			else
 			{
@@ -146,8 +146,8 @@ public class ColorWheel
 			case 'R' :
 			if(match.color != kBlueTarget)
 			{
-				WOFmotor.set(0.4);
-				System.out.println("Red");
+				WOFmotor.set(0.25);
+				// System.out.println("Red");
 			}
 			else
 			{
@@ -160,8 +160,8 @@ public class ColorWheel
 			case 'Y' :
 			if(match.color != kGreenTarget)
 			{
-				WOFmotor.set(0.4);
-				System.out.println("Yellow");
+				WOFmotor.set(0.25);
+				// System.out.println("Yellow");
 			}
 			else
 			{
@@ -177,7 +177,7 @@ public class ColorWheel
 	{
 		if(DriverStation.getInstance().getGameSpecificMessage().length() == 0)
 		{
-			rotationControl(400);
+			rotationControl(300);
 		}
 		else
 		{

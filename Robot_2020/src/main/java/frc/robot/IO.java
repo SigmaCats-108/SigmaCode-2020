@@ -3,6 +3,7 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 
@@ -12,13 +13,16 @@ public class IO
     public static XboxController operatorController = new XboxController(1);
 
     // Main Controller Variables
-    public static boolean m_buttonA, m_buttonB, m_buttonX, m_buttonXRaw, m_buttonY, m_leftBumper, m_leftBumperReleased, m_rightBumper, m_leftStick, m_rightStick, o_buttonBReleased, m_pauseButton;
+    public static boolean m_buttonA, m_buttonB, m_buttonX, m_buttonXRaw, m_buttonY, m_leftBumper, m_leftBumperReleased, m_rightBumper, m_leftStick, m_rightStick, o_buttonBReleased, m_pauseButton, m_settingsButton;
     public static double m_leftTrigger, m_rightTrigger, m_leftAnalogX, m_rightAnalogX, m_leftAnalogY, m_rightAnalogY;
     public static boolean o_buttonA, o_buttonB, o_buttonX, o_buttonXReleased, o_buttonY, o_leftBumper, o_rightBumper, o_leftStick, o_rightStick;
     public static double o_leftTrigger, o_rightTrigger, o_leftAnalogX, o_rightAnalogX, o_leftAnalogY, o_rightAnalogY;
     static double  rpm = 15000;
     public static boolean WOF_Running = false;
     public static int m_DPad;
+    static int counter = 0;
+    static boolean hyg = false;
+    static int counter2 = 0;
 
     public static void UpdateControllers()
     {
@@ -40,8 +44,9 @@ public class IO
         m_rightAnalogY = mainController.getRawAxis(5);
         m_DPad = mainController.getPOV();
         m_pauseButton = mainController.getRawButtonPressed(8);
-        SmartDashboard.putNumber("D pad", m_DPad);
-        SmartDashboard.putNumber("rpm", rpm);
+        m_settingsButton = mainController.getRawButtonPressed(7);
+        // SmartDashboard.putNumber("D pad", m_DPad);
+        // SmartDashboard.putNumber("rpm", rpm);
     }
 
     public static void update()
@@ -55,7 +60,6 @@ public class IO
         if(m_rightTrigger > 0.5)
         {
             Robot.ballMech.variableDistanceShooter();
-            // Robot.ballMech.shooterMotor1.set(ControlMode.PercentOutput, 0.9);
         }
         else
         {
@@ -132,11 +136,51 @@ public class IO
         // Robot.wheelOfFortune.ruvib();
         // System.out.println("WOF enc: " + Robot.wheelOfFortune.WOFencoder.getPosition());
 
+        
         if(m_pauseButton)
         {
             Robot.climbMech.extendHanger();
+            Robot.climbMech.weirdClimbMotor.set(0.5);
+            hyg = true;
         }
 
+        if(counter > 46)
+        {
+            Robot.climbMech.weirdClimbMotor.set(0);
+            counter = 0;
+            hyg = false;
+        }
+        if(hyg)
+        {
+            counter++;
+        }
+
+        if(m_settingsButton)
+        {
+            Robot.climbMech.hangerSolenoid.set(Value.kReverse);
+        }
+
+        // if(hyg == true)
+        // {
+        //     if(counter < 40)
+        //         Robot.climbMech.weirdClimbMotor.set(0.5);
+        //     else
+        //         hyg = false;
+
+        //     counter++;
+        // }
+        // else if(Robot.climbMech.hangerSolenoid.get() == Value.kForward)
+        // {
+        //     Robot.climbMech.extendHanger();
+        //     hyg = false;
+        // }
+        // else
+        // {
+        //     Robot.climbMech.weirdClimbMotor.set(0);
+        //     hyg = false;
+        //     counter = 0;
+        // }
+        // System.out.println("counter" + counter);
         if(m_DPad == 0)
         {
             Robot.climbMech.climb();
@@ -149,6 +193,15 @@ public class IO
         {
             Robot.climbMech.setClimbMotors(0);
         }
+
+        // if(m_buttonB)
+        // {
+        //     Robot.climbMech.weirdClimbMotor.set(0.5);
+        // }
+        // else
+        // {
+        //     Robot.climbMech.weirdClimbMotor.set(0);
+        // }
 
         // if(m_buttonX)
         // {
@@ -192,6 +245,7 @@ public class IO
         // {
         //     Robot.ballMech.rollerMotor.set(0);
         // }
+
 
     }
 }
