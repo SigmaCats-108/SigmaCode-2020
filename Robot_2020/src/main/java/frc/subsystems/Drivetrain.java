@@ -81,8 +81,8 @@ public class Drivetrain
 		}
 	}
 
-	double turnKP = 0.01;
-	double distanceKP = 0.000003;
+	double turnKP = 0.008;
+	double distanceKP = 0.000005;
 	public boolean driveToAngle(double distance_inches, double endPose)
 	{
 		double averageEncoderPosition = -rightTalon1.getSelectedSensorPosition();
@@ -98,11 +98,12 @@ public class Drivetrain
 
 	public boolean turnAngle(double angle)
 	{
-		double speed = (angle - Robot.navX.angle) * 0.006;
+		double speed = (angle - Robot.navX.angle) * 0.007;
 		sigmaDrive(-speed, speed);
 		if(Math.abs(angle - Robot.navX.angle) < 5)
 		{
 			sigmaDrive(0, 0);
+			System.out.println("doneTurning");
 			return true;
 		}
 		return false;
@@ -142,31 +143,6 @@ public class Drivetrain
 		}
 		return false;
 	}
-
-	// public int driveCounter = 0;
-	// public int shootCounter = 0;
-	// public void autoDrive()
-	// {
-	// 	sigmaDrive(0.2, 0.2);
-	// 	if(driveCounter > 125)
-	// 	{
-	// 		sigmaDrive(0, 0);
-	// 		if(shootCounter < 200)
-	// 		{
-	// 			Robot.ballMech.variableDistanceShooter();
-	// 		}
-	// 		else
-	// 		{
-	// 			Robot.ballMech.stopShooter();
-	// 			Robot.ballMech.runRoller(0);
-	// 			Robot.sigmaSight.counter = 0;
-	// 			Robot.ballMech.counter = 0;
-	// 			Robot.ballMech.shooterState = 0;
-	// 		}
-	// 		shootCounter++;
-	// 	}
-	// 	driveCounter++;
-	// }
 
 	public int autoState = 0;
 	int counter = 0;
@@ -269,7 +245,7 @@ public class Drivetrain
 			case 2:
 			Robot.ballMech.intake(-1);
 			// System.out.println("driving straight");
-			if(driveStraight(140))
+			if(driveStraight(390))
 			{
 				autoState = 3;
 			}
@@ -280,11 +256,12 @@ public class Drivetrain
 			if(turnAngle(0))
 			{
 				autoState = 4;
+				driveStraightState = 0;
 			}
 			break;
 
 			case 4:
-			if(driveStraight(75))
+			if(driveStraight(200))
 			{
 				autoState = 5;
 			}
@@ -295,6 +272,63 @@ public class Drivetrain
 		}
 	}
 
+
+	public void sixBallAutoTwo()
+	{
+		switch(autoState)
+		{
+			case 0:
+			Robot.ballMech.variableDistanceShooter();
+			if(autoCounter > 200)
+			{
+				Robot.ballMech.stopShooter();
+				Robot.ballMech.runRoller(0);
+				Robot.sigmaSight.counter = 0;
+				Robot.ballMech.counter = 0;
+				Robot.ballMech.shooterState = 0;
+				autoState = 1;
+			}
+			autoCounter++;
+			break;
+
+			case 1:
+			if(turnAngle(-181))
+			{
+				autoState = 2;
+			}
+			break;
+
+			case 2:
+			Robot.ballMech.intakeTwo(-1);
+			// System.out.println("driving straight");
+			if(driveStraight(390))
+			{
+				autoState = 3;
+				driveStraightState = 0;
+			}
+			break;
+
+			case 3:
+			Robot.ballMech.stopIntake();
+			if(driveStraight(-180))
+			{
+				autoState = 4;
+				driveStraightState = 0;
+			}
+			break;
+
+			case 4:
+			if(turnAngle(0))
+			{
+				autoState = 5;
+			}
+
+			case 5:
+			Robot.ballMech.intakeMotor.set(-1);
+			Robot.ballMech.variableDistanceShooter();
+			break;
+		}
+	}
 	public void eightBallAuto(double distance_inches, double endPose)
 	{
 		switch(autoState)
@@ -380,6 +414,7 @@ public class Drivetrain
 		// SmartDashboard.putNumber("leftenc", leftTalon1.getSelectedSensorPosition());
 		// SmartDashboard.putNumber("rightenc", rightTalon1.getSelectedSensorPosition());
 		// SmartDashboard.putNumber("angle", Robot.navX.angle);
-		SmartDashboard.putNumber("outputcurrent", rightTalon1.getSupplyCurrent());
+		SmartDashboard.putNumber("outputcurrentleft", leftTalon1.getSupplyCurrent());
+		SmartDashboard.putNumber("outputcurrentright", rightTalon1.getSupplyCurrent());
 	}
 }

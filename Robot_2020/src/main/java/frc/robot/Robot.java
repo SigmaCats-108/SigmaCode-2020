@@ -37,7 +37,7 @@ public class Robot extends TimedRobot
     @Override
     public void robotInit() 
     {
-        currentLimit = new SupplyCurrentLimitConfiguration(true, 40, 30, 1);
+        currentLimit = new SupplyCurrentLimitConfiguration(true, 20, 25, 1);
         sigmaSight = new SigmaSight();
         drivetrain = new Drivetrain();
         navX = new NavX();
@@ -63,7 +63,7 @@ public class Robot extends TimedRobot
         drivetrain.update();
         navX.updateAHRS();
         // navX.update();
-        // ballMech.update();
+        ballMech.update();
         wheelOfFortune.updateColors();
         // climbMech.update();
         IO.update();
@@ -104,7 +104,10 @@ public class Robot extends TimedRobot
         //     Robot.drivetrain.threeBallAuto();
         // }
         // autoCounter++;
-        Robot.drivetrain.sixBallAuto();
+        // Robot.drivetrain.sixBallAutoTwo();
+        // Robot.drivetrain.turnAngle(-181);
+        // Robot.drivetrain.driveStraight(270);
+        Robot.drivetrain.threeBallAuto();
     }
 
     @Override

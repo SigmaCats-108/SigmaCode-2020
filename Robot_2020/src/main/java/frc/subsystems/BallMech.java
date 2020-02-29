@@ -20,7 +20,7 @@ public class BallMech
 {
 	public TalonFX shooterMotor1 = new TalonFX(7);
 	private TalonFX shooterMotor2 = new TalonFX(8);
-	private CANSparkMax intakeMotor = new CANSparkMax(1, MotorType.kBrushless);
+	public CANSparkMax intakeMotor = new CANSparkMax(1, MotorType.kBrushless);
 	private CANSparkMax intakeMotor2 = new CANSparkMax(6, MotorType.kBrushless);
 	private CANSparkMax intakeMotor3 = new CANSparkMax(7, MotorType.kBrushless);
 	public CANSparkMax rollerMotor = new CANSparkMax(2, MotorType.kBrushed);
@@ -46,8 +46,8 @@ public class BallMech
 
 	public void update()
 	{
-		SmartDashboard.putNumber("velocity", shooterMotor1.getSelectedSensorVelocity());
-		SmartDashboard.putNumber("desired speed", Robot.sigmaSight.desiredSpeed());
+		// SmartDashboard.putNumber("velocity", shooterMotor1.getSelectedSensorVelocity());
+		// SmartDashboard.putNumber("desired speed", Robot.sigmaSight.desiredSpeed());
 		SmartDashboard.putNumber("ballsensor intake", ballSensor_intake.getRangeInches());
 	}
 
@@ -57,12 +57,20 @@ public class BallMech
 		// System.out.println("intaking");
 		intakeCounter++;
 		extendIntake(true);
-		if(intakeCounter > 40)
+		if(intakeCounter > 20)
 		{
 			intakeMotor.set(speed);
 			intakeMotor2.set(0.2);
 			// System.out.println("hit 40");
 		}
+	}
+
+	public void intakeTwo(double speed)
+	{
+		extendIntake(true);
+		intakeMotor.set(speed);
+		intakeMotor2.set(0.2);
+
 	}
 
 	public int rollerState = 0;
