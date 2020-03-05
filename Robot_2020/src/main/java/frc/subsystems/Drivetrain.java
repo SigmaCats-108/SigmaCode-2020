@@ -5,6 +5,8 @@ import frc.robot.Robot;
 
 import frc.robot.RobotMap;
 
+import javax.security.auth.AuthPermission;
+
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.sensors.SensorInitializationStrategy;
@@ -81,21 +83,6 @@ public class Drivetrain
 		}
 	}
 
-	double turnKP = 0.008;
-	double distanceKP = 0.000005;
-	public boolean driveToAngle(double distance_inches, double endPose)
-	{
-		double averageEncoderPosition = -rightTalon1.getSelectedSensorPosition();
-		double desiredPosition = averageEncoderPosition + (distance_inches * ENC_TICKS_PER_INCH);
-		double distance_adjust = (desiredPosition - averageEncoderPosition) * distanceKP;
-		double angle_adjust = (endPose - Robot.navX.angle) * turnKP;
-		double left_command = -angle_adjust + distance_adjust;
-		double right_command = angle_adjust + distance_adjust;
-		sigmaDrive(left_command, right_command);
-		return averageEncoderPosition > desiredPosition - 100 && averageEncoderPosition < desiredPosition + 100 
-		&& Robot.navX.angle > endPose - 2 && Robot.navX.angle < endPose + 2;
-	}
-
 	public boolean turnAngle(double angle)
 	{
 		double speed = (angle - Robot.navX.angle) * 0.007;
@@ -109,6 +96,8 @@ public class Drivetrain
 		return false;
 	}
 
+	double turnKP = 0.008;
+	double distanceKP = 0.000005;
 	public int driveStraightState = 0;
 	double desiredPosition = 0, averageEncoderPosition = 0;
 	double distance_adjust = 0;
@@ -125,11 +114,9 @@ public class Drivetrain
 			break;
 
 			case 1:
-			double angle_adjust = (currentAngle - Robot.navX.angle) * 0.028;
+			double angle_adjust = (currentAngle - Robot.navX.angle) * 0.008;
 			distance_adjust = (desiredPosition - (-rightTalon1.getSelectedSensorPosition())) * distanceKP;
 			sigmaDrive(-distance_adjust - angle_adjust, -distance_adjust + angle_adjust);
-			// System.out.println("speed" + distance_adjust);
-			// System.out.println("desired" + desiredPosition);
 			if(Math.abs(distance_adjust) < 0.2)
 			{
 				driveStraightState = 2;
@@ -138,7 +125,33 @@ public class Drivetrain
 
 			case 2:
 			sigmaDrive(0, 0);
-			// System.out.println("FINISHED");
+			return true;
+		}
+		return false;
+	}
+
+	public boolean driveToAngle(double distance_inches, double endPose)
+	{
+		switch(driveStraightState)
+		{
+			case 0:
+			averageEncoderPosition = -rightTalon1.getSelectedSensorPosition();
+			desiredPosition = averageEncoderPosition + (distance_inches * ENC_TICKS_PER_INCH);
+			driveStraightState = 1;
+			break;
+
+			case 1:
+			double angle_adjust = (endPose - Robot.navX.angle) * 0.028;
+			distance_adjust = (desiredPosition - (-rightTalon1.getSelectedSensorPosition())) * distanceKP;
+			sigmaDrive(-distance_adjust - angle_adjust, -distance_adjust + angle_adjust);
+			if(Math.abs(distance_adjust) < 0.2 && Math.abs(endPose - Robot.navX.angle) < 5)
+			{
+				driveStraightState = 2;
+			}
+			break;
+
+			case 2:
+			sigmaDrive(0, 0);
 			return true;
 		}
 		return false;
@@ -329,6 +342,7 @@ public class Drivetrain
 			break;
 		}
 	}
+
 	public void eightBallAuto(double distance_inches, double endPose)
 	{
 		switch(autoState)
@@ -348,26 +362,27 @@ public class Drivetrain
 			break;
 
 			case 1:
-			if(turnAngle(-176))
+			if(turnAngle(-181))
 			{
 				autoState = 2;
 			}
 			break;
 
 			case 2:
-			// Robot.ballMech.intake(-1);
-			// System.out.println("driving straight");
-			if(driveStraight(250))
+			Robot.ballMech.intakeTwo(-1);
+			if(driveStraight(450))
 			{
 				autoState = 3;
+				driveStraightState = 0;
 			}
 			break;
 
 			case 3:
 			Robot.ballMech.stopIntake();
-			if(driveStraight(-150))
+			if(driveStraight(-180))
 			{
 				autoState = 4;
+				driveStraightState = 0;
 			}
 			break;
 
@@ -376,11 +391,82 @@ public class Drivetrain
 			{
 				autoState = 5;
 			}
+
+			case 5:
+			Robot.ballMech.intakeMotor.set(-1);
+			Robot.ballMech.variableDistanceShooter();
+			break;
+		}
+	}
+
+	public void tenBallAuto()
+	{
+		switch(autoState)
+		{
+			case 0:
+			Robot.ballMech.intake(-1);
+			if(driveToAngle(70, 20))
+			{
+				driveStraightState = 0;
+				autoState = 1;
+			}
+			break;
+
+			case 1:
+			Robot.ballMech.stopIntake();
+			if(turnAngle(-180))
+			{
+				autoState = 2;
+			}
+			break;
+
+			case 2:
+			Robot.ballMech.variableDistanceShooter();
+			if(autoCounter > 50)
+			{
+				Robot.ballMech.stopShooter();
+				Robot.ballMech.runRoller(0);
+				Robot.sigmaSight.counter = 0;
+				Robot.ballMech.counter = 0;
+				Robot.ballMech.shooterState = 0;
+				autoState = 1;
+			}
+			autoCounter++;
+			break;
+
+			case 3:
+			if(driveToAngle(80, 0))
+			{
+				autoState = 4;
+				driveStraightState = 0;
+			}
+			break;
+
+			case 4:
+			Robot.ballMech.intake(-1);
+			if(driveStraight(100))
+			{
+				autoState = 5;
+			}
 			break;
 
 			case 5:
-			Robot.ballMech.variableDistanceShooter();
+			if(driveStraight(-100))
+			{
+				autoState = 6;
+			}
 			break;
+
+			case 6:
+			if(turnAngle(-180))
+			{
+				autoState = 7;
+			}
+			break;
+
+			case 7:
+			Robot.ballMech.intakeMotor.set(-1);
+			Robot.ballMech.variableDistanceShooter();
 		}
 	}
 
