@@ -26,13 +26,10 @@ public class Robot extends TimedRobot
     public static ClimbMech climbMech;
     public static SupplyCurrentLimitConfiguration currentLimit;
 
-    SendableChooser<String> m_chooser;
-	final String kAutoNameDefault = "!Do Nothing!";
-	final String shoot3 = "shoot 3 and back up";
-	final String sixBallAuto = "six ball auto";
-	// String rightAuto = "Right Auto";
-	// String centerAuto = "Center Auto";
-	String m_autoSelected;
+    // SendableChooser<String> m_chooser;
+	// final String kAutoNameDefault = "!Do Nothing!";
+	// final String shoot3 = "shoot 3 and back up";
+	// final String sixBallAuto = "six ball auto";
 
     @Override
     public void robotInit() 
@@ -50,8 +47,6 @@ public class Robot extends TimedRobot
         // m_chooser.setDefaultOption(kAutoNameDefault, kAutoNameDefault);
 		// m_chooser.addOption(shoot3, shoot3);
 		// m_chooser.addOption(sixBallAuto, sixBallAuto);
-		// // m_chooser.addOption(centerAuto, centerAuto);
-		// // m_chooser.addOption(rightAuto, rightAuto);
 		// SmartDashboard.putData("Auto Modes", m_chooser);
     }
 
@@ -62,17 +57,17 @@ public class Robot extends TimedRobot
         // sigmaSight.testValues();
         drivetrain.update();
         navX.updateAHRS();
-        // navX.update();
+        navX.update();
         ballMech.update();
         wheelOfFortune.updateColors();
         // climbMech.update();
         IO.update();
     }
-    
+
     @Override
     public void autonomousInit() 
     {
-        // m_autoSelected = m_chooser.getSelected();
+        // String m_autoSelected = m_chooser.getSelected();
 
         Robot.navX.resetAngle();
         Robot.drivetrain.autoState = 0;
@@ -104,10 +99,11 @@ public class Robot extends TimedRobot
         //     Robot.drivetrain.threeBallAuto();
         // }
         // autoCounter++;
-        // Robot.drivetrain.sixBallAutoTwo();
+        Robot.drivetrain.sixBallAutoTwo();
         // Robot.drivetrain.turnAngle(-181);
         // Robot.drivetrain.driveStraight(270);
-        Robot.drivetrain.threeBallAuto();
+        // Robot.drivetrain.threeBallAuto();
+        // ballMech.rollerMotor.set(-1);
     }
 
     @Override

@@ -60,6 +60,7 @@ public class IO
         if(m_rightTrigger > 0.5)
         {
             Robot.ballMech.variableDistanceShooter();
+            // Robot.ballMech.shooterMotor1.set(ControlMode.PercentOutput, 0.4);
         }
         else
         {

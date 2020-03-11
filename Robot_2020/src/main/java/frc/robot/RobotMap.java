@@ -30,14 +30,14 @@ public class RobotMap
 	public static final int WOF_MOTOR = 5;
 
 	// Vision System Constants
-	public static final double HATCH_VISION_TURN_PGAIN = -0.035;
+	public static final double HATCH_VISION_TURN_PGAIN = -0.02;
 	public static final double HATCH_VISION_DISTANCE_PGAIN = 0.35;
 	public static final double HATCH_VISION_MIN_AIM_COMMAND = 0.0;
 	public static final double HATCH_VISION_DESIRED_TARGET_AREA = 4.0;	
 
 	public static final int kPIDLoopIdx = 0;
-	public static final double kF = 0.045;
-	public static final double kP = 0.1023;
+	public static final double kF = 0.047;
+	public static final double kP = 0.3;
 	public static final double kI = 0;
 	public static final double kD = 0;
 	public static final int kTimeoutMs = 0;

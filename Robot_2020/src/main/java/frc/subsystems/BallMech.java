@@ -25,7 +25,7 @@ public class BallMech
 	private CANSparkMax intakeMotor3 = new CANSparkMax(7, MotorType.kBrushless);
 	public CANSparkMax rollerMotor = new CANSparkMax(2, MotorType.kBrushed);
 	private DoubleSolenoid intakeCylinder = new DoubleSolenoid(RobotMap.PCM2 ,RobotMap.INTAKE_EXTENDER_FWD , RobotMap.INTAKE_EXTENDER_REV);
-	private Ultrasonic ballSensor_intake = new Ultrasonic(4, 5);
+	private Ultrasonic ballSensor_intake = new Ultrasonic(4, 3);
 	// private Ultrasonic ballSensor_shooter = new Ultrasonic(2, 3);
 	
 	public BallMech()
@@ -46,8 +46,8 @@ public class BallMech
 
 	public void update()
 	{
-		// SmartDashboard.putNumber("velocity", shooterMotor1.getSelectedSensorVelocity());
-		// SmartDashboard.putNumber("desired speed", Robot.sigmaSight.desiredSpeed());
+		SmartDashboard.putNumber("velocity", shooterMotor1.getSelectedSensorVelocity());
+		SmartDashboard.putNumber("desired speed", Robot.sigmaSight.desiredSpeed());
 		SmartDashboard.putNumber("ballsensor intake", ballSensor_intake.getRangeInches());
 	}
 
@@ -203,6 +203,7 @@ public class BallMech
 			if (Robot.sigmaSight.lineUpToShoot())
 			{
 				shooterState = 1;
+				Robot.drivetrain.sigmaDrive(0, 0);
 			}
 			break;
 

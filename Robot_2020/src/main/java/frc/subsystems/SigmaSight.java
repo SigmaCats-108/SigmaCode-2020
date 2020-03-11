@@ -92,13 +92,21 @@ public class SigmaSight
     public int counter = 0;
     public boolean lineUpToShoot()
     {
+        double minAimCommand = 0.07;
         steering_adjust = turnKp * xVal;
-        Robot.drivetrain.sigmaDrive(steering_adjust, -steering_adjust);
+        if(xVal > 0)
+        {
+            Robot.drivetrain.sigmaDrive(steering_adjust - minAimCommand, -steering_adjust + minAimCommand);
+        }
+        else if(xVal < 0)
+        {
+            Robot.drivetrain.sigmaDrive(steering_adjust + minAimCommand, -steering_adjust - minAimCommand);
+        }
         if(Math.abs(xVal) < 2)
         {
             counter++;
         }
-        return counter > 50;
+        return counter > 100;
     }
     
     /**
